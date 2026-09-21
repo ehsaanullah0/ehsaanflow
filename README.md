@@ -3,7 +3,7 @@
 # 🗜️ EHSAAN FLOW
 
 # POWERFUL PRIJECT AND TASK MANAGER, COMPLETELY OFFLINE
-# 🔗 [**ehsaanqr.ai.studio**](https://ehsaanqr.ai.studio/)
+# 🔗 [**ehsaanflow.ai.studio**](https://ehsaanflow.ai.studio/)
 
 <p>
   <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android2.svg">&nbsp;
