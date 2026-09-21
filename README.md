@@ -1,4 +1,17 @@
-# 🌊 EHSAAN Flow
+<div align="center">
+    
+# 🗜️ EHSAAN FLOW
+
+# POWERFUL PRIJECT AND TASK MANAGER, COMPLETELY OFFLINE
+# 🔗 [**ehsaanqr.ai.studio**](https://ehsaanqr.ai.studio/)
+
+<p>
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android2.svg">&nbsp;
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/AndroidStudio/androidstudio2.svg">&nbsp;
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Kotlin/kotlin2.svg">&nbsp;
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceGPLv3/licencegplv32.svg">
+</p>
+
 
 ### A calm, powerful, local-first workspace for getting things done.
 
@@ -6,8 +19,7 @@
 
 EHSAAN Flow brings your everyday productivity into one focused workspace — combining **task management, Kanban, calendar planning, weekly views, productivity analytics, and journaling** without requiring an account or a cloud backend.
 
-> **Your work stays in your browser.
-> Your workflow stays yours.**
+## **Your work stays in your browser.Your workflow stays yours.**
 
 ---
 
@@ -18,6 +30,8 @@ EHSAAN Flow brings your everyday productivity into one focused workspace — com
 [![License](https://img.shields.io/badge/License-GPL--3.0-E7AC08?style=for-the-badge)](#-license)
 
 </p>
+
+</div>
 
 ---
 
