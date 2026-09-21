@@ -1,6 +1,6 @@
 <div align="center">
     
-# 🗜️ EHSAAN FLOW
+# 🌊 EHSAAN FLOW
 
 # POWERFUL PRIJECT AND TASK MANAGER, COMPLETELY OFFLINE
 # 🔗 [**ehsaanflow.ai.studio**](https://ehsaanflow.ai.studio/)
@@ -61,26 +61,6 @@ No complicated setup.
 No dependency on a cloud database.
 
 Just **open → work → save → continue.**
-
----
-
-## 🧭 One Workspace. Multiple Ways to Think.
-
-EHSAAN Flow lets you look at the same work from different perspectives.
-
-| View              | Purpose                        |
-| ----------------- | ------------------------------ |
-| 📋 **Tasks**      | Manage your complete task list |
-| 🗂️ **Kanban**    | Organize work visually         |
-| 📅 **Calendar**   | See tasks across dates         |
-| 🗓️ **Weekly**    | Plan and review your week      |
-| ☀️ **Today**      | Focus on what's happening now  |
-| 📊 **Statistics** | Understand your productivity   |
-| 📔 **Journal**    | Reflect, record and look back  |
-
-You don't have to change your workflow to fit the app.
-
-**EHSAAN Flow adapts to the way you think.**
 
 ---
 
@@ -161,34 +141,6 @@ Your tasks don't change.
 
 ---
 
-# 📅 Calendar & Weekly Planning
-
-Your task list tells you **what** needs to happen.
-
-The calendar tells you **when**.
-
-Use the calendar and weekly views to:
-
-* See upcoming work
-* Understand deadlines
-* Plan your week
-* Review previous days
-* Navigate through your workload
-
-And when something changes, reschedule it without rebuilding the task.
-
----
-
-# ☀️ Today
-
-A focused view for the day in front of you.
-
-Instead of staring at everything you've ever created, EHSAAN Flow can bring your attention back to:
-
-> **What actually matters today?**
-
----
-
 # 📊 Productivity Intelligence
 
 EHSAAN Flow doesn't stop at counting completed tasks.
@@ -248,16 +200,6 @@ It's a sentence you wrote six months ago.
 
 ---
 
-# ⚡ Quick Add
-
-Don't want to fill out a form?
-
-Use the quick-add workflow to create tasks faster.
-
-EHSAAN Flow also includes natural-language parsing support to make task creation feel less like data entry and more like simply **telling the app what needs to happen.**
-
----
-
 # 💾 Local-First by Design
 
 EHSAAN Flow is built around a simple principle:
@@ -313,22 +255,6 @@ Import supports:
 **Replace** — completely replace the current dataset.
 
 Your productivity data shouldn't be trapped inside an app.
-
----
-
-# 🎨 Personalization
-
-Make the workspace feel like yours.
-
-EHSAAN Flow supports:
-
-* 🌞 Light mode
-* 🌙 Dark mode
-* 🖥️ System theme
-* 🎨 Custom categories
-* 🏷️ Custom tags
-* 📅 Week-start preferences
-* 📐 Sidebar preferences
 
 ---
 
@@ -397,63 +323,6 @@ Your browser is the primary home for your data.
 **You control your data.
 You can export it.
 You can restore it.**
-
----
-
-# 🛣️ Roadmap
-
-EHSAAN Flow is still evolving.
-
-Possible future directions include:
-
-* [ ] More powerful recurring tasks
-* [ ] Habit-specific tracking
-* [ ] Improved natural-language task creation
-* [ ] More calendar interactions
-* [ ] Advanced productivity insights
-* [ ] Better data portability
-* [ ] More personalization
-* [ ] Offline-first PWA capabilities
-* [ ] More powerful keyboard workflows
-
-The goal isn't to add features endlessly.
-
-The goal is to make the existing experience **feel effortless.**
-
----
-
-# 🚀 Philosophy
-
-EHSAAN Flow follows the same philosophy behind the rest of the EHSAAN ecosystem:
-
-> **Make useful things.
-> Make them feel good to use.**
-
-Less friction.
-
-Less noise.
-
-More flow.
-
----
-
-# 📸 Screenshots
-
-> Add your best screenshots here — preferably:
->
-> **Today → Tasks → Kanban → Calendar → Statistics → Journal**
-
-```text
-/screenshots
-├── today.png
-├── tasks.png
-├── kanban.png
-├── calendar.png
-├── statistics.png
-└── journal.png
-```
-
-A good README should let someone understand the product **before they ever open it.**
 
 ---
 
