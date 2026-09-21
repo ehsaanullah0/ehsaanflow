@@ -1,5 +1,8 @@
 <div align="center">
     
+<img width="102" height="86" alt="c8cec104-4c51-417b-940d-c2ad37d25089_upscayl_2x_upscayl-standard-4x" src="https://github.com/user-attachments/assets/9b165bca-6126-4db6-9ac9-60788baaa3a1" />
+
+
 # 🌊 EHSAAN FLOW
 
 # POWERFUL PRIJECT AND TASK MANAGER, COMPLETELY OFFLINE
