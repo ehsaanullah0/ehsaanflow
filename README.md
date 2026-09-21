@@ -64,6 +64,26 @@ Just **open → work → save → continue.**
 
 ---
 
+# SCREENSHOTS
+
+<img width="1346" height="722" alt="image" src="https://github.com/user-attachments/assets/3aa220eb-4b19-49b9-bc70-3d576826c440" />
+
+<img width="1365" height="728" alt="image" src="https://github.com/user-attachments/assets/42d7efc8-9bae-45f5-9126-5ba32a9a0d88" />
+
+<img width="1326" height="721" alt="image" src="https://github.com/user-attachments/assets/59128d19-79dd-4ce3-8379-1767c002309a" />
+
+<img width="1340" height="723" alt="image" src="https://github.com/user-attachments/assets/dbf4b108-c7f7-4337-830b-5ba669b949b9" />
+
+<img width="1362" height="720" alt="image" src="https://github.com/user-attachments/assets/e3b17910-0218-48dc-a0d4-40563a7bcbd6" />
+
+<img width="1348" height="766" alt="image" src="https://github.com/user-attachments/assets/a76a630d-0f4d-4cad-9817-40fd3809f4ec" />
+
+<img width="1349" height="727" alt="image" src="https://github.com/user-attachments/assets/2ebbd658-c8f5-43fc-8c9c-caa86e060528" />
+
+<img width="1343" height="768" alt="image" src="https://github.com/user-attachments/assets/e7d878c1-83d4-419a-9d9e-80f1495d6584" />
+
+---
+
 # 📋 Task Management
 
 Everything you need for serious task management without turning the interface into a cockpit.
