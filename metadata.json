@@ -1,0 +1,8 @@
+{
+  "name": "EHSAAN FLOW",
+  "description": "A modern, minimal, responsive to-do list web app with task prioritization, subtasks, calendar and weekly views, productivity insights, and local backup.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
