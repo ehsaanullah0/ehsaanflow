@@ -21,6 +21,14 @@ EHSAAN Flow brings your everyday productivity into one focused workspace — com
 
 ---
 
+# 🌐 Try EHSAAN Flow
+
+### **Live application**
+
+## 👉 https://ehsaanflow.ai.studio/
+
+---
+
 ## ✨ Why EHSAAN Flow?
 
 Most productivity apps make you choose between simplicity and power.
@@ -432,14 +440,6 @@ More flow.
 ```
 
 A good README should let someone understand the product **before they ever open it.**
-
----
-
-# 🌐 Try EHSAAN Flow
-
-**Live application**
-
-👉 https://ehsaanflow.ai.studio/
 
 ---
 
