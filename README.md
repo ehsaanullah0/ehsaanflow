@@ -110,7 +110,33 @@ Just **open → work → save → continue.**
 
 ### AFTER — The New Flow
 
-<!-- Add your new screenshots here -->
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/1cd579e8-a97a-4367-a5b5-1faef880879a" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/75a5e8d0-9aed-4125-b2d5-2e4134bb990e" />
+
+<img width="1366" height="757" alt="image" src="https://github.com/user-attachments/assets/663623ef-3aae-4435-8243-655fd363f9d0" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/3b2b5fcb-33ec-4805-a80f-07a4a3851630" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/c699f78c-7aa7-445a-8399-967c7ea90197" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/0a925143-1066-43f7-8071-f10c41359be5" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/40520315-5e3a-4dfe-8f6c-76f082e9f603" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/45fa03a9-af32-4c33-8532-7afe66c17df5" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/3a4ce83b-e7ea-4575-aa66-5e9d14c99821" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/9dcf849c-a1b4-41ef-a2ca-86224c7cc794" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/5b5f88d1-c66d-4251-ab17-c1f9178e4314" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/1fe91208-7213-45d2-b99b-f9d43f98a142" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/482b1c08-1182-4b26-9ebd-94c7ef7f3bc1" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/9ae6cbe7-38f7-4517-bfd4-aee81e238f4e" />
 
 # 📋 Task Management
 
@@ -165,27 +191,6 @@ Launch Website
 ```
 
 Track progress at both the task and subtask level.
-
----
-
-# 🗂️ Kanban
-
-Turn your tasks into a visual workflow.
-
-Move from:
-
-**Ideas → Planned → In Progress → Completed**
-
-or organize the board around other dimensions such as:
-
-* Status
-* Priority
-* Category
-* Date
-
-Your tasks don't change.
-
-**Only the way you see them does.**
 
 ---
 
@@ -320,37 +325,6 @@ EHSAAN Flow is built using modern web technologies:
 </p>
 
 ---
-
-# 🏗️ Project Structure
-
-```text
-EHSAAN Flow
-│
-├── App.tsx
-│
-├── components/
-│   ├── TodayDashboard
-│   ├── TasksView
-│   ├── KanbanBoardView
-│   ├── CalendarView
-│   ├── WeeklyView
-│   ├── OverallStatsView
-│   ├── JournalView
-│   ├── SettingsView
-│   ├── QuickAddModal
-│   ├── TaskDetailDrawer
-│   ├── DayDetailModal
-│   ├── FirstLaunchModal
-│   └── ThreadedSubtasks
-│
-├── utils/
-│   ├── storage.ts
-│   ├── dateUtils.ts
-│   ├── nlpParser.ts
-│   └── colorUtils.ts
-│
-└── types.ts
-```
 
 The project is intentionally component-driven so individual parts of the experience can evolve without rebuilding the entire application.
 
