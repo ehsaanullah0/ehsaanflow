@@ -23,9 +23,9 @@
 EHSAAN Flow brings your everyday productivity into one focused workspace — combining **task management, Kanban, calendar planning, weekly views, productivity analytics, and journaling** without requiring an account or a cloud backend.
 
 ## **Your work stays in your browser.Your workflow stays yours.**
-# WHAT'S NEW IN v1.2.0
+# WHAT'S NEW IN v1.1.5
 <p align="center">
-<img width="881" height="283" alt="image" src="https://github.com/user-attachments/assets/9469dac4-2fdc-4e73-a913-6e3d2eec59a5" />
+<img width="937" height="270" alt="image" src="https://github.com/user-attachments/assets/80ce03bb-c2ce-4287-b4ff-2fd71782742f" />
 
 ---
 
