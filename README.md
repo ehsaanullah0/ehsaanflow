@@ -15,6 +15,15 @@
   <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceGPLv3/licencegplv32.svg">
 </p>
 
+<p align="center">
+  
+<a href="https://youtu.be/YWJAUpBpycY" target="_blank">
+  <img
+    width="200"
+    src="https://github.com/user-attachments/assets/bf633cc6-a8ed-4fca-b7b1-1aef2df991d3"
+    alt="Watch EHSAAN QR Demo Video"
+  />
+</a>
 
 ### A calm, powerful, local-first workspace for getting things done.
 
