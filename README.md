@@ -5,7 +5,7 @@
 
 # 🌊 EHSAAN FLOW
 
-# POWERFUL PRIJECT AND TASK MANAGER, COMPLETELY OFFLINE
+# POWERFUL PROJECT AND TASK MANAGER, COMPLETELY OFFLINE
 # 🔗 [**ehsaanflow.ai.studio**](https://ehsaanflow.ai.studio/)
 
 <p align="center">
