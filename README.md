@@ -8,13 +8,6 @@
 # POWERFUL PRIJECT AND TASK MANAGER, COMPLETELY OFFLINE
 # 🔗 [**ehsaanflow.ai.studio**](https://ehsaanflow.ai.studio/)
 
-<p>
-  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android2.svg">&nbsp;
-  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/AndroidStudio/androidstudio2.svg">&nbsp;
-  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Kotlin/kotlin2.svg">&nbsp;
-  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceGPLv3/licencegplv32.svg">
-</p>
-
 <p align="center">
   
 <a href="https://youtu.be/YWJAUpBpycY" target="_blank">
@@ -24,6 +17,14 @@
     alt="Watch EHSAAN QR Demo Video"
   />
 </a>
+
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android2.svg">&nbsp;
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/AndroidStudio/androidstudio2.svg">&nbsp;
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Kotlin/kotlin2.svg">&nbsp;
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/LicenceGPLv3/licencegplv32.svg">
+</p>
+
+
 
 ### A calm, powerful, local-first workspace for getting things done.
 
@@ -121,6 +122,15 @@ Just **open → work → save → continue.**
 </table>
 
 ### AFTER — The New Flow
+
+<a href="https://youtu.be/YWJAUpBpycY" target="_blank">
+  <img
+    width="200"
+    src="https://github.com/user-attachments/assets/bf633cc6-a8ed-4fca-b7b1-1aef2df991d3"
+    alt="Watch EHSAAN QR Demo Video"
+  />
+</a>
+
 
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/1cd579e8-a97a-4367-a5b5-1faef880879a" />
 
