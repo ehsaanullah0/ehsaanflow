@@ -1,8 +1,72 @@
 {
-  "name": "EHSAAN FLOW",
-  "description": "A modern, minimal, responsive to-do list web app with task prioritization, subtasks, calendar and weekly views, productivity insights, and local backup.",
+  "name": "Ehsaan Flow",
+  "description": "A premium personal task, planning, journaling, and self-progress management application.",
   "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"],
+  "changelog": [
+    {
+      "version": "1.1.6",
+      "improvements": [
+        "Redesigned the official brand logo to perfectly match the requested green leaf branch design with bold outlines on a peach squircle and dark brown backdrop",
+        "Rendered high-fidelity inline SVGs of the exact brand logo across Sidebar, Mobile Header, Onboarding, and Sample Notice popups",
+        "Compiled and exported the exact same high-resolution PNG assets for PWA install packages, apple-touch-icons, and favicons on desktop and mobile",
+        "Resolved React console warnings by migrating standard SVG properties (stroke-width, stroke-linejoin, stroke-linecap) to standard React camelCase equivalents across all brand assets"
+      ]
+    },
+    {
+      "version": "1.1.5",
+      "improvements": [
+        "Added interactive logic explanation info icons on every single analytic element across the application",
+        "Created a central analytic explanations registry detailing formulas, data sources, and tips for all metrics",
+        "Integrated explanation modals into Today View stats, sub-folder progress, habit rituals, and progress meters",
+        "Embedded metric logic buttons into Digital Matrices Bento Grid (Overall Ratio, Velocity, Streaks, Subtask Depth)",
+        "Added formula badges and popups to Task Completion Heatmap, Insights View badges, and Tasks View filters",
+        "Added logic explanation buttons to Habit Cards, Habit Analytics Modal, Progress Meter Cards, and Deep Analytics",
+        "Ensured full transparency for all metric calculations with step-by-step breakdown modal overlays"
+      ]
+    },
+    {
+      "version": "1.1.4",
+      "improvements": [
+        "Isolated Everyday recurring task completions so checking a task on one date does not affect other days",
+        "Redesigned individual habit analytics logger into an interactive two-month side-by-side progress grid",
+        "Updated expanded habit calendar modal to default directly to the 12-month Yearly View",
+        "Renamed Delete Sample Data At Once action button to Delete All Data At Once",
+        "Completely removed the Wipe Everything button for cleaner and simpler data safety controls",
+        "Updated task completion tracking across Today view, Calendar agenda, and Heatmaps to respect date-specific completion arrays",
+        "Maintained full 365-day year snapshot seeding and date accuracy across all habit and progress matrices"
+      ]
+    },
+    {
+      "version": "1.1.3",
+      "improvements": [
+        "Optimized 365-day year snapshot seeding across habit heatmaps, 12-month historical tasks, journal logs, and progress meters",
+        "Bounded Everyday recurring tasks strictly to the month they were created across Calendar, Today, Heatmaps, and Badges",
+        "Fixed timezone offset shifts in YYYY-MM-DD local date formatting for accurate date matching in all timezones",
+        "Persisted sidebar collapse/expand position in local storage across browser sessions and viewport updates",
+        "Added first-setup sample data notification modal with quick options to explore or delete sample data at once",
+        "Added 1-click Delete Sample Data At Once action in Settings > Data Safety for clean workspace reset",
+        "Added Restore Latest Backup action button in Automatic Backups header for instant 1-click workspace recovery"
+      ]
+    },
+    {
+      "version": "1.1.2",
+      "improvements": [
+        "Improved sub-folder progress visual appearance and ensured subtasks render by their name",
+        "Presented latest two months side by side in Insights execution matrix and unified Extended Calendar styling"
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "improvements": [
+        "No emoji as default in new habit",
+        "Added option to exclude habits from overall analytics",
+        "Added option to hide habits from all habit section",
+        "Fix: Hidden habits now correctly appear within their category view",
+        "Tasks in today view are now sorted by high to low priority",
+        "Minor UI consistency and performance optimizations",
+        "Added GO MORE DEEP full-screen analytics layer for overall and individual habits"
+      ]
+    }
   ]
 }

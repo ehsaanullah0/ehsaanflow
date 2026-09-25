@@ -1,98 +1,105 @@
-export type Priority = 'low' | 'medium' | 'high' | 'urgent';
+export type Priority = 'high' | 'medium' | 'low';
 
-export interface Subtask {
+export interface SubTask {
   id: string;
   title: string;
   completed: boolean;
-  priority?: Priority;
-  dueDate?: string; // YYYY-MM-DD
-  dueTime?: string; // HH:mm
-  notes?: string;
-  tags?: string[];
-  createdAt?: string;
+  parentTaskId: string;
 }
-
-export type TaskColor =
-  | 'default'
-  | 'emerald'
-  | 'sky'
-  | 'indigo'
-  | 'violet'
-  | 'amber'
-  | 'rose'
-  | 'teal'
-  | 'coral'
-  | 'slate'
-  | 'lemon'
-  | 'lavender';
 
 export interface Task {
   id: string;
   title: string;
-  notes?: string;
+  description?: string;
   dueDate: string; // YYYY-MM-DD
-  dueTime?: string; // Optional HH:mm
+  dueTime?: string; // HH:mm
+  startDate?: string; // YYYY-MM-DD for duration tasks
+  endDate?: string; // YYYY-MM-DD for duration tasks
+  priority: Priority;
   completed: boolean;
   completedAt?: string;
-  priority: Priority;
-  category?: string; // Category ID
-  color?: TaskColor | string; // Minimal custom color with high-contrast text
-  subtasks?: Subtask[];
-  tags?: string[]; // e.g. ['work', 'urgent', 'read']
-  pinned?: boolean; // Star / pin to top
-  status?: 'todo' | 'in_progress' | 'done'; // Kanban workflow status
-  wontDo?: boolean; // won't do / skipped
-  order: number;
-  createdAt: string; // YYYY-MM-DD
+  createdAt: string;
+  category?: string;
+  tags?: string[];
+  isRecurring?: 'daily' | 'weekly' | 'duration' | 'none';
+  completedDates?: string[]; // Array of YYYY-MM-DD dates completed for daily recurring tasks
+  subtasks: SubTask[];
 }
-
-export interface Category {
-  id: string;
-  name: string;
-  color: string;
-  icon?: string;
-}
-
-export type MoodLevel = 'great' | 'good' | 'neutral' | 'low' | 'bad';
-export type EnergyLevel = 1 | 2 | 3 | 4 | 5;
 
 export interface JournalEntry {
   id: string;
   date: string; // YYYY-MM-DD
-  title?: string;
+  title: string;
   content: string;
-  mood: MoodLevel;
-  energy: EnergyLevel;
+  moodEmoji?: string;
   tags?: string[];
-  gratitude?: string[];
-  highlight?: string;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
 }
 
-export interface UserSettings {
-  theme: 'light' | 'dark' | 'system';
-  weekStartsOn: 0 | 1; // 0 = Sunday, 1 = Monday
-  hasSeenWelcome: boolean;
-  sidebarCollapsed?: boolean;
+export type MeasurementType = 'scale_1_5' | 'percentage' | 'time' | 'numeric';
+
+export interface ProgressMeter {
+  id: string;
+  name: string;
+  emojiIcon: string;
+  unitType: MeasurementType;
+  goalValue?: number; // e.g. 5 for scale_1_5, 100 for percentage, 180 (minutes) for time, 10 for numeric
+  unitLabel?: string; // e.g. "hours", "glasses", "%"
+  // Map date (YYYY-MM-DD) to numeric value or formatted string
+  entries: Record<string, number>; 
+  createdAt: string;
 }
+
+export interface Habit {
+  id: string;
+  name: string;
+  emoji?: string; // e.g. "🔥", "🏃", "📚", "⚡", "🌿"
+  description?: string; // e.g. "Having the screen time of less than 2 hour"
+  category?: string; // e.g. "Focus", "Health", "Study", "Productivity", "Mindfulness"
+  startDate: string; // YYYY-MM-DD (e.g. "2026-08-01")
+  targetDaysPerWeek?: number; // default 7
+  frequency?: 'daily' | 'weekdays' | 'weekends' | 'custom';
+  color?: string; // e.g. "#823b28" or custom accent
+  completedDates: string[]; // List of YYYY-MM-DD dates when completed
+  order?: number; // Display order index for drag/reordering
+  createdAt: string;
+  isArchived?: boolean;
+  excludeFromAnalytics?: boolean;
+  isHidden?: boolean;
+}
+
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  category?: string;
+  tags?: string[];
+  isPinned?: boolean;
+  color?: string; // warm card accent e.g. '#fbf6ef', '#f6e9d7', '#edd8c2', '#f8db97', '#eec7a7'
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type NavSection = 'today' | 'habits' | 'tasks' | 'notes' | 'calendar' | 'journal' | 'progress' | 'insights' | 'settings';
 
 export interface AppData {
-  version: number;
   tasks: Task[];
-  categories: Category[];
-  journalEntries?: JournalEntry[];
-  settings: UserSettings;
-  lastBackupDate?: string;
+  habits: Habit[];
+  journalEntries: JournalEntry[];
+  progressMeters: ProgressMeter[];
+  notes?: Note[];
+  userPreferences: {
+    userName: string;
+    avatarEmoji: string;
+    defaultHomeScreen?: string;
+    theme?: 'original' | 'olive';
+  };
+  autoBackupConfig?: {
+    enabled: boolean;
+    intervalHours: number;
+    retentionCount: number;
+    lastBackupTime?: string;
+    folderName?: string;
+  };
 }
-
-export type ActiveTab =
-  | 'today'
-  | 'tasks'
-  | 'kanban'
-  | 'calendar'
-  | 'weekly'
-  | 'journal'
-  | 'stats'
-  | 'settings';
-

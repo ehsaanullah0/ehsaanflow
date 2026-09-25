@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background: Deep solid brown -->
+  <rect width="512" height="512" rx="128" fill="#823b28"/>
+
+  <!-- Inner rounded squircle container -->
+  <rect x="76" y="76" width="360" height="360" rx="150" fill="#df734c"/>
+
+  <!-- Leaf branch shifted and rotated to match the image precisely -->
+  <g transform="translate(256, 256) rotate(35) scale(1.15)">
+    <!-- 1. Leaves (Drawn first so outlines don't overlap stem) -->
+    <!-- Leaf Left Bottom -->
+    <path d="M 0,20 C -35,-5 -60,15 -50,45 C -40,75 -10,50 0,20 Z" fill="#22c55e" stroke="#000000" stroke-width="16" stroke-linejoin="round" />
+    
+    <!-- Leaf Right Bottom -->
+    <path d="M 0,20 C 35,-5 60,15 50,45 C 40,75 10,50 0,20 Z" fill="#22c55e" stroke="#000000" stroke-width="16" stroke-linejoin="round" />
+    
+    <!-- Leaf Left Top -->
+    <path d="M 0,-40 C -35,-65 -60,-45 -50,-15 C -40,15 -10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" stroke-width="16" stroke-linejoin="round" />
+    
+    <!-- Leaf Right Top -->
+    <path d="M 0,-40 C 35,-65 60,-45 50,-15 C 40,15 10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" stroke-width="16" stroke-linejoin="round" />
+    
+    <!-- Leaf Tip -->
+    <path d="M 0,-90 C -18,-115 -18,-150 0,-155 C 18,-150 18,-115 0,-90 Z" fill="#22c55e" stroke="#000000" stroke-width="16" stroke-linejoin="round" />
+
+    <!-- 2. Thick Black Outline of Stem & Side Branches -->
+    <path d="M 0,105 L 0,-95" fill="none" stroke="#000000" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 0,35 L -25,20" fill="none" stroke="#000000" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 0,35 L 25,20" fill="none" stroke="#000000" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 0,-25 L -25,-40" fill="none" stroke="#000000" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 0,-25 L 25,-40" fill="none" stroke="#000000" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- 3. Inner Stem & Side Branches (Bright Yellow-Green) layered on top -->
+    <path d="M 0,105 L 0,-95" fill="none" stroke="#a3e635" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 0,35 L -25,20" fill="none" stroke="#a3e635" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 0,35 L 25,20" fill="none" stroke="#a3e635" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 0,-25 L -25,-40" fill="none" stroke="#a3e635" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M 0,-25 L 25,-40" fill="none" stroke="#a3e635" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

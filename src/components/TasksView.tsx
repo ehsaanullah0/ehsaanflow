@@ -1,910 +1,300 @@
-import React, { useState, useMemo } from 'react';
-import {
-  Plus,
-  Check,
-  Clock,
-  Calendar,
-  AlertTriangle,
-  ArrowUp,
-  ArrowDown,
-  Edit2,
-  Trash2,
-  Search,
-  CheckCircle2,
-  ListTodo,
-  ChevronDown,
-  ChevronRight,
-  ArrowUpDown,
-  CheckCheck,
-  ListTree,
-  X,
-  Star,
-  Tag as TagIcon,
-  Columns,
-  Layers,
-  Flag,
-} from 'lucide-react';
-import { AppData, Priority, Subtask, Task } from '../types';
-import { addDays, formatDisplayDate } from '../utils/dateUtils';
-import { getTaskCardClasses, getTaskColorOption, PRIORITY_CONFIG } from '../utils/colorUtils';
+import React, { useState } from 'react';
+import { Plus, Filter, Search, CheckSquare, List, Grid, Calendar, Clock, Hash, X } from 'lucide-react';
+import { Task, Priority } from '../types';
+import { TaskCard } from './TaskCard';
+import { AnalyticInfoButton } from './AnalyticInfoModal';
+import { ANALYTIC_EXPLANATIONS } from '../utils/analyticExplanations';
 
 interface TasksViewProps {
-  data: AppData;
-  todayStr: string;
-  onToggleTask: (taskId: string) => void;
-  onToggleSubtask: (taskId: string, subtaskId: string) => void;
+  tasks: Task[];
+  searchQuery: string;
+  onToggleTaskComplete: (taskId: string) => void;
+  onToggleSubtaskComplete: (taskId: string, subtaskId: string) => void;
   onAddSubtask: (taskId: string, title: string) => void;
-  onDeleteSubtask: (taskId: string, subtaskId: string) => void;
-  onEditSubtask: (taskId: string, subtaskId: string, newTitle: string) => void;
-  onOpenAddTask: () => void;
-  onEditTask: (task: Task) => void;
-  onSelectTask: (task: Task) => void;
-  onTogglePin: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
-  onReorderTasks: (newTasks: Task[]) => void;
-  onClearCompletedTasks: () => void;
-  onMarkAllCompleted: (taskIds: string[]) => void;
-  onBatchReschedule: (taskIds: string[], newDate: string) => void;
-  onBatchPriority: (taskIds: string[], priority: Priority) => void;
-  onBatchDelete: (taskIds: string[]) => void;
-  onSwitchToKanban?: () => void;
+  onEditTask: (task: Task) => void;
+  onOpenNewTaskModal: () => void;
 }
 
 export const TasksView: React.FC<TasksViewProps> = ({
-  data,
-  todayStr,
-  onToggleTask,
-  onToggleSubtask,
+  tasks,
+  searchQuery,
+  onToggleTaskComplete,
+  onToggleSubtaskComplete,
   onAddSubtask,
-  onDeleteSubtask,
-  onEditSubtask,
-  onOpenAddTask,
-  onEditTask,
-  onSelectTask,
-  onTogglePin,
   onDeleteTask,
-  onReorderTasks,
-  onClearCompletedTasks,
-  onMarkAllCompleted,
-  onBatchReschedule,
-  onBatchPriority,
-  onBatchDelete,
-  onSwitchToKanban,
+  onEditTask,
+  onOpenNewTaskModal,
 }) => {
-  const [filterTab, setFilterTab] = useState<'all' | 'today' | 'upcoming' | 'overdue' | 'completed'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [filterTab, setFilterTab] = useState<'all' | 'pending' | 'completed' | 'high' | 'medium' | 'low'>('pending');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'order' | 'dueDate' | 'priority' | 'title'>('order');
-  const [expandedSubtasksTaskId, setExpandedSubtasksTaskId] = useState<string | null>(null);
-  const [newSubtaskInputs, setNewSubtaskInputs] = useState<Record<string, string>>({});
-  const [editingSubtaskId, setEditingSubtaskId] = useState<string | null>(null);
-  const [editSubtaskTitle, setEditSubtaskTitle] = useState('');
 
-  // Batch Selection State (TickTick feature)
-  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  // Extract unique categories
+  const categories = Array.from(
+    new Set(tasks.map((t) => t.category).filter(Boolean))
+  ) as string[];
 
-  const categoryMap = useMemo(() => new Map(data.categories.map((c) => [c.id, c])), [data.categories]);
+  // Extract unique tags
+  const allTags = Array.from(
+    new Set(tasks.flatMap((t) => t.tags || []).filter(Boolean))
+  ) as string[];
 
-  // Collect all unique tags
-  const allTags = useMemo(() => {
-    const tagsSet = new Set<string>();
-    data.tasks.forEach((t) => {
-      t.tags?.forEach((tag) => tagsSet.add(tag));
-    });
-    return Array.from(tagsSet).sort();
-  }, [data.tasks]);
+  // Filter tasks
+  const filteredTasks = tasks.filter((t) => {
+    // Clean search term
+    const term = searchQuery.trim().toLowerCase().replace(/^#/, '');
 
-  // Priority styling
-  const priorityBadgeStyle: Record<Priority, string> = {
-    urgent: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-900',
-    high: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-900',
-    medium: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200 dark:border-blue-900',
-    low: 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700',
-  };
+    // Search query filter: matches name, description, category, tags, or subtasks
+    const matchesSearch =
+      !term ||
+      t.title.toLowerCase().includes(term) ||
+      (t.description && t.description.toLowerCase().includes(term)) ||
+      (t.category && t.category.toLowerCase().includes(term)) ||
+      (t.tags && t.tags.some((tag) => tag.toLowerCase().includes(term))) ||
+      (t.subtasks && t.subtasks.some((st) => st.title.toLowerCase().includes(term)));
 
-  const priorityWeight: Record<Priority, number> = {
-    urgent: 4,
-    high: 3,
-    medium: 2,
-    low: 1,
-  };
+    // Status / Priority filter
+    let matchesFilter = true;
+    if (filterTab === 'pending') matchesFilter = !t.completed;
+    if (filterTab === 'completed') matchesFilter = t.completed;
+    if (filterTab === 'high') matchesFilter = t.priority === 'high';
+    if (filterTab === 'medium') matchesFilter = t.priority === 'medium';
+    if (filterTab === 'low') matchesFilter = t.priority === 'low';
 
-  // Counts for tabs
-  const countToday = data.tasks.filter((t) => t.dueDate === todayStr && !t.completed).length;
-  const countOverdue = data.tasks.filter((t) => !t.completed && t.dueDate && t.dueDate < todayStr).length;
-  const countUpcoming = data.tasks.filter((t) => !t.completed && t.dueDate && t.dueDate > todayStr).length;
-  const countCompleted = data.tasks.filter((t) => t.completed).length;
+    // Category filter
+    const matchesCategory =
+      selectedCategory === 'all' || t.category === selectedCategory;
 
-  // Filter logic
-  const filteredTasks = useMemo(() => {
-    let result = data.tasks.filter((task) => {
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchTitle = task.title.toLowerCase().includes(q);
-        const matchNotes = task.notes?.toLowerCase().includes(q);
-        const matchSubtasks = task.subtasks?.some((s) => s.title.toLowerCase().includes(q));
-        const matchTags = task.tags?.some((t) => t.toLowerCase().includes(q));
-        if (!matchTitle && !matchNotes && !matchSubtasks && !matchTags) return false;
-      }
+    // Tag filter
+    const matchesTag =
+      selectedTag === 'all' || (t.tags && t.tags.includes(selectedTag));
 
-      // Category filter
-      if (selectedCategory !== 'all' && task.category !== selectedCategory) {
-        return false;
-      }
+    return matchesSearch && matchesFilter && matchesCategory && matchesTag;
+  });
 
-      // Priority filter
-      if (selectedPriority !== 'all' && task.priority !== selectedPriority) {
-        return false;
-      }
-
-      // Tag filter
-      if (selectedTag !== 'all') {
-        if (!task.tags || !task.tags.includes(selectedTag)) return false;
-      }
-
-      // Tab filter
-      if (filterTab === 'today') {
-        return task.dueDate === todayStr;
-      }
-      if (filterTab === 'upcoming') {
-        return !task.completed && task.dueDate > todayStr;
-      }
-      if (filterTab === 'overdue') {
-        return !task.completed && task.dueDate < todayStr;
-      }
-      if (filterTab === 'completed') {
-        return task.completed;
-      }
-
-      return true; // 'all'
-    });
-
-    // Sorting (pinned items always anchor to top unless user explicitly changes sorting)
-    result.sort((a, b) => {
-      // If pinned priority sorting
-      if (a.pinned && !b.pinned) return -1;
-      if (!a.pinned && b.pinned) return 1;
-
-      if (sortBy === 'dueDate') {
-        return a.dueDate.localeCompare(b.dueDate);
-      } else if (sortBy === 'priority') {
-        return priorityWeight[b.priority] - priorityWeight[a.priority];
-      } else if (sortBy === 'title') {
-        return a.title.localeCompare(b.title);
-      }
-      return a.order - b.order;
-    });
-
-    return result;
-  }, [data.tasks, searchQuery, selectedCategory, selectedPriority, selectedTag, filterTab, sortBy, todayStr]);
-
-  // Batch Selection helpers
-  const handleToggleSelectTask = (taskId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedTaskIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(taskId)) {
-        next.delete(taskId);
-      } else {
-        next.add(taskId);
-      }
-      return next;
-    });
-  };
-
-  const handleSelectAll = () => {
-    if (selectedTaskIds.size === filteredTasks.length) {
-      setSelectedTaskIds(new Set());
-    } else {
-      setSelectedTaskIds(new Set(filteredTasks.map((t) => t.id)));
-    }
-  };
-
-  const handleClearSelection = () => {
-    setSelectedTaskIds(new Set());
-  };
-
-  // Task reordering
-  const handleMove = (index: number, direction: 'up' | 'down') => {
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= filteredTasks.length) return;
-
-    const newFiltered = [...filteredTasks];
-    const temp = newFiltered[index];
-    newFiltered[index] = newFiltered[targetIndex];
-    newFiltered[targetIndex] = temp;
-
-    const taskIdsOrder = newFiltered.map((t) => t.id);
-    const updatedAllTasks = [...data.tasks].sort((a, b) => {
-      const idxA = taskIdsOrder.indexOf(a.id);
-      const idxB = taskIdsOrder.indexOf(b.id);
-      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-      return a.order - b.order;
-    });
-
-    onReorderTasks(updatedAllTasks);
-  };
-
-  const toggleExpandSubtasks = (taskId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setExpandedSubtasksTaskId((prev) => (prev === taskId ? null : taskId));
-  };
-
-  const handleAddSubtaskSubmit = (taskId: string, e: React.FormEvent) => {
-    e.preventDefault();
-    const title = (newSubtaskInputs[taskId] || '').trim();
-    if (!title) return;
-    onAddSubtask(taskId, title);
-    setNewSubtaskInputs((prev) => ({ ...prev, [taskId]: '' }));
-  };
-
-  const handleStartEditSubtask = (sub: Subtask, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingSubtaskId(sub.id);
-    setEditSubtaskTitle(sub.title);
-  };
-
-  const handleSaveEditSubtask = (taskId: string, subId: string) => {
-    if (editSubtaskTitle.trim()) {
-      onEditSubtask(taskId, subId, editSubtaskTitle.trim());
-    }
-    setEditingSubtaskId(null);
-  };
+  const pendingCount = tasks.filter((t) => !t.completed).length;
+  const completedCount = tasks.filter((t) => t.completed).length;
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-24 relative">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-              All Tasks
-            </h2>
-            {onSwitchToKanban && (
-              <button
-                type="button"
-                onClick={onSwitchToKanban}
-                className="ml-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-semibold transition-colors"
-                title="Switch to Kanban Board View"
-              >
-                <Columns className="w-3.5 h-3.5" />
-                <span>Kanban View</span>
-              </button>
-            )}
+    <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+      {/* Search status indicator if search query active */}
+      {searchQuery.trim() && (
+        <div className="bg-[#edd8c2] border border-[#d4aa86] rounded-2xl px-4 py-2.5 flex items-center justify-between text-xs font-mono">
+          <div className="flex items-center gap-2 text-[#823b28]">
+            <Search size={14} className="text-[#df734c]" />
+            <span>
+              Searching for <strong className="text-[#281b18]">"{searchQuery}"</strong> across titles, notes, and tags
+            </span>
           </div>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-            Organize, prioritize, batch manage, and inspect your to-dos with sub-tasks.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {countCompleted > 0 && filterTab === 'completed' && (
-            <button
-              onClick={onClearCompletedTasks}
-              className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400 transition-colors"
-            >
-              Clear Completed
-            </button>
-          )}
-
-          {filteredTasks.some((t) => !t.completed) && (
-            <button
-              onClick={() => onMarkAllCompleted(filteredTasks.filter((t) => !t.completed).map((t) => t.id))}
-              className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400 transition-colors flex items-center gap-1.5"
-            >
-              <CheckCheck className="w-3.5 h-3.5" />
-              <span>Mark All Done</span>
-            </button>
-          )}
-
-          <button
-            onClick={onOpenAddTask}
-            className="px-4 py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors flex items-center gap-1.5 shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Task</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-neutral-100 dark:bg-neutral-800/60 border border-neutral-200/60 dark:border-neutral-700/60 overflow-x-auto text-xs font-medium">
-        {[
-          { id: 'all', label: 'All Tasks', count: data.tasks.length },
-          { id: 'today', label: 'Today', count: countToday },
-          { id: 'upcoming', label: 'Upcoming', count: countUpcoming },
-          { id: 'overdue', label: 'Overdue', count: countOverdue, alert: countOverdue > 0 },
-          { id: 'completed', label: 'Completed', count: countCompleted },
-        ].map((tab) => {
-          const isSelected = filterTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setFilterTab(tab.id as any)}
-              className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
-                isSelected
-                  ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white font-semibold shadow-xs'
-                  : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
-              }`}
-            >
-              <span>{tab.label}</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                  tab.alert
-                    ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400'
-                    : isSelected
-                    ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white'
-                    : 'bg-neutral-200/60 dark:bg-neutral-700 text-neutral-500'
-                }`}
-              >
-                {tab.count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Tag Filter Pills Bar if tags exist */}
-      {allTags.length > 0 && (
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-          <span className="text-[11px] font-semibold text-neutral-400 flex items-center gap-1 shrink-0">
-            <TagIcon className="w-3 h-3" />
-            <span>Tags:</span>
+          <span className="font-bold bg-[#823b28] text-white px-2.5 py-0.5 rounded-lg">
+            {filteredTasks.length} result{filteredTasks.length === 1 ? '' : 's'}
           </span>
+        </div>
+      )}
+
+      {/* Top Filter Bar */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-4 bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-3.5 sm:p-4 shadow-sm">
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1.5 lg:pb-0 scrollbar-none">
           <button
-            type="button"
-            onClick={() => setSelectedTag('all')}
-            className={`px-2.5 py-1 rounded-lg transition-colors shrink-0 ${
-              selectedTag === 'all'
-                ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-semibold'
-                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+            onClick={() => setFilterTab('pending')}
+            className={`px-3 sm:px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              filterTab === 'pending'
+                ? 'bg-[#823b28] text-[#f6e9d7] shadow-sm'
+                : 'bg-[#f6e9d7] hover:bg-[#edd8c2] text-[#281b18]'
             }`}
           >
-            All
+            Pending ({pendingCount})
           </button>
-          {allTags.map((tag) => (
+
+          <button
+            onClick={() => setFilterTab('all')}
+            className={`px-3 sm:px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              filterTab === 'all'
+                ? 'bg-[#823b28] text-[#f6e9d7] shadow-sm'
+                : 'bg-[#f6e9d7] hover:bg-[#edd8c2] text-[#281b18]'
+            }`}
+          >
+            All ({tasks.length})
+          </button>
+
+          <button
+            onClick={() => setFilterTab('completed')}
+            className={`px-3 sm:px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              filterTab === 'completed'
+                ? 'bg-[#823b28] text-[#f6e9d7] shadow-sm'
+                : 'bg-[#f6e9d7] hover:bg-[#edd8c2] text-[#281b18]'
+            }`}
+          >
+            Completed ({completedCount})
+          </button>
+
+          <div className="w-px h-5 bg-[#281b18]/15 mx-1 hidden sm:block shrink-0" />
+
+          <button
+            onClick={() => setFilterTab('high')}
+            className={`px-3 py-2 rounded-2xl text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+              filterTab === 'high'
+                ? 'bg-[#df734c] text-white shadow-sm'
+                : 'bg-[#f6e9d7] hover:bg-[#edd8c2] text-[#cb5d37]'
+            }`}
+          >
+            High Priority
+          </button>
+
+          <button
+            onClick={() => setFilterTab('medium')}
+            className={`px-3 py-2 rounded-2xl text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+              filterTab === 'medium'
+                ? 'bg-[#422119] text-[#fbf6ef] shadow-sm'
+                : 'bg-[#f6e9d7] hover:bg-[#edd8c2] text-[#422119]'
+            }`}
+          >
+            Medium
+          </button>
+
+          <button
+            onClick={() => setFilterTab('low')}
+            className={`px-3 py-2 rounded-2xl text-xs font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+              filterTab === 'low'
+                ? 'bg-[#1e40af] text-white shadow-sm'
+                : 'bg-[#f6e9d7] hover:bg-[#edd8c2] text-[#1e40af]'
+            }`}
+          >
+            Low
+          </button>
+        </div>
+
+        {/* View Layout Toggle & Category Dropdown */}
+        <div className="flex items-center gap-2 sm:gap-3 w-full lg:w-auto justify-between lg:justify-end flex-wrap sm:flex-nowrap">
+          {/* Category Selector */}
+          {categories.length > 0 && (
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-[#f6e9d7] border border-[#281b18]/15 text-[#281b18] text-xs font-semibold rounded-2xl px-3 py-2 outline-none focus:border-[#823b28] cursor-pointer min-h-[38px]"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {/* List/Grid View Mode Toggle */}
+          <div className="flex items-center bg-[#f6e9d7] border border-[#281b18]/15 rounded-2xl p-1 gap-1 min-h-[38px]">
             <button
-              key={tag}
-              type="button"
-              onClick={() => setSelectedTag(tag === selectedTag ? 'all' : tag)}
-              className={`px-2.5 py-1 rounded-lg transition-colors shrink-0 ${
-                selectedTag === tag
-                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-semibold'
-                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 sm:px-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+                viewMode === 'grid' ? 'bg-[#823b28] text-[#f6e9d7] shadow-xs' : 'text-[#823b28]/70 hover:text-[#823b28]'
+              }`}
+              title="Grid View"
+              aria-label="Grid View"
+            >
+              <Grid size={15} />
+              <span className="hidden xs:inline sm:inline text-[11px]">Grid</span>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 sm:px-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+                viewMode === 'list' ? 'bg-[#823b28] text-[#f6e9d7] shadow-xs' : 'text-[#823b28]/70 hover:text-[#823b28]'
+              }`}
+              title="List View"
+              aria-label="List View"
+            >
+              <List size={15} />
+              <span className="hidden xs:inline sm:inline text-[11px]">List</span>
+            </button>
+          </div>
+
+          <button
+            onClick={onOpenNewTaskModal}
+            className="flex items-center gap-1.5 bg-[#823b28] hover:bg-[#6f2f1f] text-[#f6e9d7] px-3.5 sm:px-4 py-2 rounded-2xl text-xs font-bold transition-all shadow-md cursor-pointer whitespace-nowrap min-h-[38px]"
+          >
+            <Plus size={15} />
+            <span>New Task</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Tag Filter Chips (if tags exist) */}
+      {allTags.length > 0 && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 -mt-2">
+          <span className="font-mono text-[10px] font-bold text-[#823b28] uppercase tracking-wider whitespace-nowrap flex items-center gap-1">
+            <Hash size={12} /> Tags:
+          </span>
+          <button
+            onClick={() => setSelectedTag('all')}
+            className={`px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold transition-colors cursor-pointer whitespace-nowrap ${
+              selectedTag === 'all'
+                ? 'bg-[#823b28] text-white'
+                : 'bg-[#f6e9d7] text-[#823b28] hover:bg-[#edd8c2]'
+            }`}
+          >
+            All Tags
+          </button>
+          {allTags.map((t) => (
+            <button
+              key={t}
+              onClick={() => setSelectedTag(selectedTag === t ? 'all' : t)}
+              className={`px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold transition-colors cursor-pointer whitespace-nowrap ${
+                selectedTag === t
+                  ? 'bg-[#df734c] text-white shadow-xs'
+                  : 'bg-[#f6e9d7] text-[#823b28] hover:bg-[#edd8c2] border border-[#281b18]/10'
               }`}
             >
-              #{tag}
+              #{t}
             </button>
           ))}
         </div>
       )}
 
-      {/* Search and Secondary Filter Controls */}
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        {/* Search */}
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search tasks, notes, subtasks, or #tags..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white"
-          />
-        </div>
-
-        {/* Category selector */}
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="w-full sm:w-auto px-3 py-2 text-xs rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white"
-        >
-          <option value="all">All Categories</option>
-          {data.categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-
-        {/* Priority selector */}
-        <select
-          value={selectedPriority}
-          onChange={(e) => setSelectedPriority(e.target.value)}
-          className="w-full sm:w-auto px-3 py-2 text-xs rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white"
-        >
-          <option value="all">All Priorities</option>
-          <option value="urgent">Urgent</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
-        </select>
-
-        {/* Sort selector */}
-        <div className="flex items-center gap-1.5 w-full sm:w-auto">
-          <ArrowUpDown className="w-3.5 h-3.5 text-neutral-400" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="flex-1 sm:flex-initial px-3 py-2 text-xs rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white"
-          >
-            <option value="order">Custom Order</option>
-            <option value="dueDate">Due Date</option>
-            <option value="priority">Priority</option>
-            <option value="title">Alphabetical</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Select All / Batch Toggle Bar */}
-      {filteredTasks.length > 0 && (
-        <div className="flex items-center justify-between text-xs text-neutral-400 px-1">
-          <button
-            type="button"
-            onClick={handleSelectAll}
-            className="flex items-center gap-2 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors"
-          >
-            <div
-              className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
-                selectedTaskIds.size === filteredTasks.length && filteredTasks.length > 0
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border-transparent'
-                  : 'border-neutral-300 dark:border-neutral-600'
-              }`}
-            >
-              {selectedTaskIds.size === filteredTasks.length && filteredTasks.length > 0 && (
-                <Check className="w-2.5 h-2.5 stroke-[3]" />
-              )}
-            </div>
-            <span>
-              {selectedTaskIds.size === filteredTasks.length && filteredTasks.length > 0
-                ? 'Deselect All'
-                : 'Select All'}
-            </span>
-          </button>
-
-          <span>
-            Showing {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''}
-          </span>
-        </div>
-      )}
-
-      {/* Task List */}
+      {/* Tasks Content Grid / List */}
       {filteredTasks.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800">
-          <ListTodo className="w-8 h-8 text-neutral-300 dark:text-neutral-600 mx-auto mb-2" />
-          <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
-            No tasks found
+        <div className="bg-[#fbf6ef] border border-dashed border-[#281b18]/20 rounded-3xl p-12 text-center flex flex-col items-center justify-center my-6">
+          <div className="w-14 h-14 rounded-2xl bg-[#edd8c2] flex items-center justify-center text-[#823b28] mb-3">
+            <CheckSquare size={28} />
+          </div>
+          <h3 className="text-base font-extrabold text-[#281b18] font-sans">
+            No matching tasks found
           </h3>
-          <p className="text-xs text-neutral-400 mt-1">
+          <p className="text-xs text-[#823b28] max-w-md mt-1">
             {searchQuery
-              ? 'Try adjusting your search terms or filters.'
-              : 'Add your first task to get started.'}
+              ? `No tasks matched "${searchQuery}". Check spelling or search by task name, description, or #tags.`
+              : 'Try adjusting your filters or create a new task to stay organized.'}
           </p>
           <button
-            onClick={onOpenAddTask}
-            className="mt-4 px-4 py-2 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-semibold"
+            onClick={onOpenNewTaskModal}
+            className="mt-4 bg-[#823b28] text-[#f6e9d7] px-5 py-2.5 rounded-2xl text-xs font-bold shadow-sm cursor-pointer hover:bg-[#6f2f1f]"
           >
             Create Task
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {filteredTasks.map((task, index) => {
-            const isOverdue = !task.completed && task.dueDate && task.dueDate < todayStr;
-            const category = task.category ? categoryMap.get(task.category) : undefined;
-            const subtasks = task.subtasks || [];
-            const completedSubtasks = subtasks.filter((s) => s.completed).length;
-            const isSubtasksExpanded = expandedSubtasksTaskId === task.id;
-            const isSelected = selectedTaskIds.has(task.id);
-            const colorOpt = getTaskColorOption(task, categoryMap);
-
-            return (
-              <div
-                key={task.id}
-                className={`p-4 rounded-2xl border transition-all group hover:border-neutral-300 dark:hover:border-neutral-700 ${
-                  isSelected
-                    ? 'bg-neutral-50 dark:bg-neutral-850 border-neutral-900 dark:border-white shadow-xs'
-                    : getTaskCardClasses(task, categoryMap)
-                }`}
-              >
-                {/* Main Task Row */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    {/* Batch Selection Checkbox */}
-                    <button
-                      type="button"
-                      onClick={(e) => handleToggleSelectTask(task.id, e)}
-                      className={`mt-1 w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors ${
-                        isSelected
-                          ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border-transparent'
-                          : 'border border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 opacity-60 group-hover:opacity-100'
-                      }`}
-                      title="Select for batch actions"
-                    >
-                      {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                    </button>
-
-                    {/* Task Completion Checkbox */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleTask(task.id);
-                      }}
-                      className={`mt-0.5 w-5 h-5 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                        task.completed
-                          ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900'
-                          : 'border-2 border-neutral-300 dark:border-neutral-600 hover:border-neutral-500'
-                      }`}
-                    >
-                      {task.completed && <Check className="w-3 h-3 stroke-[3]" />}
-                    </button>
-
-                    <div className="flex-1 min-w-0 space-y-1">
-                      {/* Title, Pin Star & Badges */}
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className={`text-sm font-semibold ${
-                            task.completed
-                              ? 'text-neutral-400 line-through'
-                              : 'text-neutral-900 dark:text-white'
-                          }`}
-                        >
-                          {task.title}
-                        </span>
-
-                        {/* Star / Pin ⭐ */}
-                        {task.pinned && (
-                          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
-                        )}
-
-                        {/* Priority Badge */}
-                        <span
-                          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
-                            priorityBadgeStyle[task.priority]
-                          }`}
-                        >
-                          {task.priority}
-                        </span>
-
-                        {/* Category Badge */}
-                        {category && (
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
-                            {category.name}
-                          </span>
-                        )}
-
-                        {/* Tags */}
-                        {task.tags &&
-                          task.tags.map((t) => (
-                            <span
-                              key={t}
-                              className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300"
-                            >
-                              #{t}
-                            </span>
-                          ))}
-                      </div>
-
-                      {/* Notes snippet */}
-                      {task.notes && (
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2">
-                          {task.notes}
-                        </p>
-                      )}
-
-                      {/* Date & Time info */}
-                      <div className="flex items-center gap-3 text-xs text-neutral-400 pt-0.5 flex-wrap">
-                        <span
-                          className={`flex items-center gap-1 ${
-                            isOverdue ? 'text-rose-600 dark:text-rose-400 font-semibold' : ''
-                          }`}
-                        >
-                          <Calendar className="w-3 h-3" />
-                          {formatDisplayDate(task.dueDate, 'relative')}
-                        </span>
-
-                        {task.dueTime && (
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {task.dueTime}
-                          </span>
-                        )}
-
-                        {/* Subtasks summary indicator */}
-                        {subtasks.length > 0 && (
-                          <button
-                            type="button"
-                            onClick={(e) => toggleExpandSubtasks(task.id, e)}
-                            className="flex items-center gap-1 text-[11px] font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white transition-colors"
-                          >
-                            <ListTree className="w-3 h-3 text-neutral-400" />
-                            <span>
-                              {completedSubtasks}/{subtasks.length} subtasks
-                            </span>
-                            <ChevronDown
-                              className={`w-3 h-3 transition-transform ${
-                                isSubtasksExpanded ? 'rotate-180' : ''
-                              }`}
-                            />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Actions */}
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {/* Toggle Pin Star */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onTogglePin(task.id);
-                      }}
-                      className={`p-1.5 rounded-lg transition-colors ${
-                        task.pinned
-                          ? 'text-amber-500 bg-amber-50 dark:bg-amber-950/40'
-                          : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                      }`}
-                      title={task.pinned ? 'Unpin' : 'Pin to top'}
-                    >
-                      <Star className={`w-3.5 h-3.5 ${task.pinned ? 'fill-amber-500' : ''}`} />
-                    </button>
-
-                    {/* Add Subtask Quick Button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExpandedSubtasksTaskId(task.id);
-                      }}
-                      className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 transition-colors flex items-center gap-1"
-                      title="Add sub-task to this task"
-                    >
-                      <Plus className="w-3 h-3" />
-                      <span>Subtask</span>
-                    </button>
-
-                    {/* Edit */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditTask(task);
-                      }}
-                      className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                      title="Edit task"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-
-                    {/* Delete */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteTask(task.id);
-                      }}
-                      className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
-                      title="Delete task"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Inline Subtasks Panel */}
-                {isSubtasksExpanded && (
-                  <div
-                    className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800/80 space-y-2.5"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-neutral-500 flex items-center gap-1">
-                        <ListTree className="w-3.5 h-3.5" />
-                        <span>Sub-tasks Checklist</span>
-                      </span>
-                      {subtasks.length > 0 && (
-                        <span className="text-[11px] text-neutral-400">
-                          {Math.round((completedSubtasks / subtasks.length) * 100)}% complete
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Subtasks Progress Bar */}
-                    {subtasks.length > 0 && (
-                      <div className="w-full h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-neutral-900 dark:bg-white rounded-full transition-all duration-300"
-                          style={{
-                            width: `${(completedSubtasks / subtasks.length) * 100}%`,
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    {/* Subtask Items */}
-                    <div className="space-y-1.5 pt-1">
-                      {subtasks.map((sub) => (
-                        <div
-                          key={sub.id}
-                          className="flex items-center justify-between gap-2 p-2 rounded-xl bg-neutral-50/90 dark:bg-neutral-850/60 border border-neutral-100 dark:border-neutral-800/80 text-xs group"
-                        >
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <button
-                              type="button"
-                              onClick={() => onToggleSubtask(task.id, sub.id)}
-                              className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors ${
-                                sub.completed
-                                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900'
-                                  : 'border border-neutral-300 dark:border-neutral-600 hover:border-neutral-400'
-                              }`}
-                            >
-                              {sub.completed && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                            </button>
-
-                            {editingSubtaskId === sub.id ? (
-                              <input
-                                type="text"
-                                value={editSubtaskTitle}
-                                onChange={(e) => setEditSubtaskTitle(e.target.value)}
-                                onBlur={() => handleSaveEditSubtask(task.id, sub.id)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') handleSaveEditSubtask(task.id, sub.id);
-                                }}
-                                className="flex-1 px-2 py-0.5 text-xs rounded border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none"
-                                autoFocus
-                              />
-                            ) : (
-                              <span
-                                onDoubleClick={(e) => handleStartEditSubtask(sub, e)}
-                                className={`truncate cursor-pointer ${
-                                  sub.completed
-                                    ? 'line-through text-neutral-400'
-                                    : 'text-neutral-700 dark:text-neutral-300'
-                                }`}
-                              >
-                                {sub.title}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              type="button"
-                              onClick={(e) => handleStartEditSubtask(sub, e)}
-                              className="p-1 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-                              title="Edit subtask"
-                            >
-                              <Edit2 className="w-3 h-3" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onDeleteSubtask(task.id, sub.id)}
-                              className="p-1 text-neutral-400 hover:text-rose-500"
-                              title="Delete subtask"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Add Subtask Input Form */}
-                    <form
-                      onSubmit={(e) => handleAddSubtaskSubmit(task.id, e)}
-                      className="flex items-center gap-2 pt-1"
-                    >
-                      <input
-                        type="text"
-                        placeholder="Add sub-task item... (Press Enter)"
-                        value={newSubtaskInputs[task.id] || ''}
-                        onChange={(e) =>
-                          setNewSubtaskInputs((prev) => ({ ...prev, [task.id]: e.target.value }))
-                        }
-                        className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-neutral-900 dark:focus:ring-white"
-                      />
-                      <button
-                        type="submit"
-                        disabled={!(newSubtaskInputs[task.id] || '').trim()}
-                        className="px-3 py-1.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-semibold disabled:opacity-40"
-                      >
-                        Add
-                      </button>
-                    </form>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Floating Batch Actions Bar (TickTick Power Feature) */}
-      {selectedTaskIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-neutral-900 dark:bg-neutral-800 text-white rounded-2xl shadow-2xl border border-neutral-700/80 px-4 py-3 flex items-center gap-3 sm:gap-4 max-w-[95vw] sm:max-w-2xl animate-in slide-in-from-bottom duration-200 flex-wrap">
-          <div className="flex items-center gap-2 pr-2 border-r border-neutral-700">
-            <span className="text-xs font-bold">
-              {selectedTaskIds.size} selected
-            </span>
-            <button
-              type="button"
-              onClick={handleClearSelection}
-              className="text-neutral-400 hover:text-white p-0.5"
-              title="Clear selection"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Quick Reschedule */}
-          <div className="flex items-center gap-1 text-xs">
-            <span className="text-neutral-400 text-[11px] hidden sm:inline">Due:</span>
-            <button
-              type="button"
-              onClick={() => onBatchReschedule(Array.from(selectedTaskIds), todayStr)}
-              className="px-2 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-medium"
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              onClick={() => onBatchReschedule(Array.from(selectedTaskIds), addDays(todayStr, 1))}
-              className="px-2 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-medium"
-            >
-              Tomorrow
-            </button>
-          </div>
-
-          {/* Quick Priority */}
-          <div className="flex items-center gap-1 text-xs">
-            <span className="text-neutral-400 text-[11px] hidden sm:inline">Priority:</span>
-            <button
-              type="button"
-              onClick={() => onBatchPriority(Array.from(selectedTaskIds), 'urgent')}
-              className="px-2 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-900 text-rose-200 text-xs font-medium"
-            >
-              Urgent
-            </button>
-            <button
-              type="button"
-              onClick={() => onBatchPriority(Array.from(selectedTaskIds), 'medium')}
-              className="px-2 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-medium"
-            >
-              Med
-            </button>
-          </div>
-
-          {/* Mark Complete */}
-          <button
-            type="button"
-            onClick={() => {
-              onMarkAllCompleted(Array.from(selectedTaskIds));
-              handleClearSelection();
-            }}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold"
-          >
-            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Done</span>
-          </button>
-
-          {/* Batch Delete */}
-          <button
-            type="button"
-            onClick={() => {
-              onBatchDelete(Array.from(selectedTaskIds));
-              handleClearSelection();
-            }}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-400 hover:bg-neutral-700 transition-colors"
-            title="Delete selected tasks"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+        <div
+          className={
+            viewMode === 'grid'
+              ? 'columns-1 sm:columns-2 lg:columns-3 gap-4 sm:gap-5 w-full [column-fill:balance]'
+              : 'flex flex-col gap-4 w-full'
+          }
+        >
+          {filteredTasks.map((task) => (
+            <div key={task.id} className={viewMode === 'grid' ? 'break-inside-avoid mb-4 sm:mb-5' : ''}>
+              <TaskCard
+                task={task}
+                searchQuery={searchQuery}
+                onToggleTaskComplete={onToggleTaskComplete}
+                onToggleSubtaskComplete={onToggleSubtaskComplete}
+                onAddSubtask={onAddSubtask}
+                onDeleteTask={onDeleteTask}
+                onEditTask={onEditTask}
+              />
+            </div>
+          ))}
         </div>
       )}
     </div>
