@@ -1,6 +1,7 @@
 <div align="center">
     
-<img width="102" height="86" alt="c8cec104-4c51-417b-940d-c2ad37d25089_upscayl_2x_upscayl-standard-4x" src="https://github.com/user-attachments/assets/9b165bca-6126-4db6-9ac9-60788baaa3a1" />
+
+<img width="192" height="192" alt="pwa-192x192" src="https://github.com/user-attachments/assets/c89321c7-5190-4130-aaf5-9c5f51d8342b" />
 
 
 # 🌊 EHSAAN FLOW
@@ -33,9 +34,10 @@
 EHSAAN Flow brings your everyday productivity into one focused workspace — combining **task management, Kanban, calendar planning, weekly views, productivity analytics, and journaling** without requiring an account or a cloud backend.
 
 ## **Your work stays in your browser.Your workflow stays yours.**
-# WHAT'S NEW IN v1.1.5
+# WHAT'S NEW IN v1.2.3
 <p align="center">
-<img width="937" height="270" alt="image" src="https://github.com/user-attachments/assets/80ce03bb-c2ce-4287-b4ff-2fd71782742f" />
+
+<img width="872" height="381" alt="image" src="https://github.com/user-attachments/assets/f919d914-43fc-48c4-b94c-a1b031b4087c" />
 
 ---
 
