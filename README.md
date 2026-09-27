@@ -1,7 +1,7 @@
 <div align="center">
     
 
-<img width="192" height="192" alt="pwa-192x192" src="https://github.com/user-attachments/assets/c89321c7-5190-4130-aaf5-9c5f51d8342b" />
+<img width="180" height="180" alt="apple-touch-icon" src="https://github.com/user-attachments/assets/0fc1a2eb-f438-4d05-80c1-4d2bb85795e9" />
 
 
 # 🌊 EHSAAN FLOW
