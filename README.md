@@ -86,7 +86,7 @@ Just **open → work → save → continue.**
 
 > **From the original idea to a more refined experience.**
 
-### BEFORE — The Original Flow
+### BEFORE — The Original Flow (**I Started From Here**)
 
 <table>
   <tr>
@@ -134,7 +134,11 @@ Just **open → work → save → continue.**
 </a>
 
 
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/1cd579e8-a97a-4367-a5b5-1faef880879a" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/934c26d5-1a1e-4462-bf88-ca77a2775bdd" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/b5e279af-87ce-4015-a86f-f38a45d9e836" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/c66892c5-35d8-4926-83f4-0141a9171800" />
 
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/75a5e8d0-9aed-4125-b2d5-2e4134bb990e" />
 
@@ -144,7 +148,7 @@ Just **open → work → save → continue.**
 
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/c699f78c-7aa7-445a-8399-967c7ea90197" />
 
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/0a925143-1066-43f7-8071-f10c41359be5" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/3423d82d-b5ab-43d2-92b1-7e719ee1b127" />
 
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/40520315-5e3a-4dfe-8f6c-76f082e9f603" />
 
@@ -160,7 +164,9 @@ Just **open → work → save → continue.**
 
 <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/482b1c08-1182-4b26-9ebd-94c7ef7f3bc1" />
 
-<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/9ae6cbe7-38f7-4517-bfd4-aee81e238f4e" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/61d6f16f-ca89-448b-bb5a-049917e951f2" />
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/5b4ea2bb-4483-44cf-981a-e5e7a3a7ad5c" />
 
 # 📋 Task Management
 
@@ -310,31 +316,6 @@ Your Browser
 * ✅ Your data stays in your browser
 
 ---
-
-# 📦 Backup & Restore
-
-Local-first shouldn't mean **easy to lose**.
-
-EHSAAN Flow includes JSON data export and import.
-
-### Export
-
-Create a portable backup of your data.
-
-### Import
-
-Restore your data when needed.
-
-Import supports:
-
-**Merge** — combine imported data with existing data.
-
-**Replace** — completely replace the current dataset.
-
-Your productivity data shouldn't be trapped inside an app.
-
----
-
 # 🧠 Built With
 
 EHSAAN Flow is built using modern web technologies:
@@ -351,6 +332,18 @@ EHSAAN Flow is built using modern web technologies:
 ---
 
 The project is intentionally component-driven so individual parts of the experience can evolve without rebuilding the entire application.
+
+---
+
+# 💛 SUPPORT THE DEVELOPMENT
+## [ CLICK HERE TO PAY DIRECTLY.](https://ehsaan.odoo.com/about-us)
+
+<img width="250" height="250" alt="ehsaan-qr-1024x1024 (1)" src="https://github.com/user-attachments/assets/7139284e-c5e5-424a-bd52-aa71ccc392a8" />
+</p>
+
+<p align="center">
+  <sub>If you find something useful here, a ⭐ is always appreciated.</sub>
+</p>
 
 ---
 
@@ -389,3 +382,42 @@ See [`LICENSE`](LICENSE) for details.
 Made with care by **EHSAAN**
 
 </p>
+
+---
+
+<p align="center">
+✦ FINDING GOOD RESOURCES SHOULDN'T BE HARD.
+
+<p align="center">
+  <a href="https://ehsaan.odoo.com/" target="_blank">
+<img width="130" height="130" alt="cropped_circle_image" src="https://github.com/user-attachments/assets/336454db-ef7d-4003-b33a-db16a945ae3c" />
+  </a>
+</p>
+
+<p align="center">
+**EHSAAN ULLAH**
+
+<p align="center">
+  <a href="mailto:worsmon@gmail.com">
+    <img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email">
+  </a>
+  &nbsp;
+  <a href="https://github.com/ehsaanullah0">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+  </a>
+  &nbsp;
+  <a href="https://ehsaan.odoo.com/">
+    <img src="https://img.shields.io/badge/Website-0A84FF?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/ehsaanullah0/niagara-premium/releases/tag/v.10.21">
+    <img src="https://img.shields.io/badge/Release-Niagara.pro-c9b58a?style=for-the-badge" />
+  </a>
+</p>
+
+<p align="center">
+  <sub>Built with curiosity, too many tabs, and the occasional “let's see what happens.”</sub>
+</p>
+
