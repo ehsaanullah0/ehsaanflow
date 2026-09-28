@@ -58,7 +58,7 @@ export const JournalDetailModal: React.FC<JournalDetailModalProps> = ({
 
   if (!isOpen || !entry) return null;
 
-  const moodMeta = MOOD_META[entry.mood] || MOOD_META.neutral;
+  const moodMeta = (entry.mood && MOOD_META[entry.mood as MoodLevel]) || MOOD_META.neutral;
   const isToday = entry.date === getTodayKey();
 
   const handleCopyText = () => {

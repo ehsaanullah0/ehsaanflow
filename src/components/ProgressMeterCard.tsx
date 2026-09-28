@@ -36,22 +36,23 @@ export const ProgressMeterCard: React.FC<ProgressMeterCardProps> = ({
       ? 100
       : meter.goalValue || 10;
 
-  // Active entries in 7D
-  const entries7d = last7Days.map((d) => meter.entries[d] || 0);
-  const activeEntries = entries7d.filter((v) => v > 0);
+  // Logged entries in 7D (properly checks d in meter.entries so 0 is recognized as a valid logged entry)
+  const loggedDays7d = last7Days.filter((d) => d in meter.entries && meter.entries[d] !== undefined && meter.entries[d] !== null);
+  const loggedValues7d = loggedDays7d.map((d) => meter.entries[d]);
 
   // Range average calculation
   const average =
-    activeEntries.length > 0
-      ? Math.round((activeEntries.reduce((a, b) => a + b, 0) / activeEntries.length) * 10) / 10
+    loggedValues7d.length > 0
+      ? Math.round((loggedValues7d.reduce((a, b) => a + b, 0) / loggedValues7d.length) * 10) / 10
       : 0;
 
   // Today's value
-  const todayVal = meter.entries[todayStr] ?? 0;
+  const isTodayLogged = todayStr in meter.entries && meter.entries[todayStr] !== undefined && meter.entries[todayStr] !== null;
+  const todayVal = isTodayLogged ? meter.entries[todayStr] : 0;
 
   // Formatting values
   const formatTodayDisplay = () => {
-    if (todayVal === 0 && !(todayStr in meter.entries)) {
+    if (!isTodayLogged) {
       return 'Not Logged';
     }
     if (meter.unitType === 'scale_1_5') return `${todayVal}/5`;

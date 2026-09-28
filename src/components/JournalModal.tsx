@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, Tag, Smile } from 'lucide-react';
 import { JournalEntry } from '../types';
+import { getTodayKey } from '../utils/dateUtils';
 
 interface JournalModalProps {
   isOpen: boolean;
@@ -17,7 +18,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
   editingEntry,
   initialDate,
 }) => {
-  const [date, setDate] = useState(initialDate || new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(initialDate || getTodayKey());
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [moodEmoji, setMoodEmoji] = useState('😊');
@@ -34,7 +35,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
       setMoodEmoji(editingEntry.moodEmoji || '😊');
       setTags(editingEntry.tags || ['Reflection']);
     } else {
-      setDate(initialDate || new Date().toISOString().split('T')[0]);
+      setDate(initialDate || getTodayKey());
       setTitle('');
       setContent('');
       setMoodEmoji('😊');

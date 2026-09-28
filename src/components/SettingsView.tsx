@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Download,
   Upload,
@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   Check,
   Code2,
-  Github,
   Heart,
   ExternalLink,
   Trash2,
@@ -20,7 +19,8 @@ import {
   AlertTriangle,
   Mail,
   RotateCcw,
-  Palette
+  Palette,
+  Camera,
 } from 'lucide-react';
 import { AppData } from '../types';
 import { BackupSnapshot } from '../services/backupStorage';
@@ -32,9 +32,18 @@ interface SettingsViewProps {
   appData: AppData;
   currentTheme?: 'original';
   onExportData: () => void;
+  onExportNotes: () => void;
   onImportData: (jsonStr: string) => void;
   onClearAllData: () => void;
-  onUpdatePreferences: (userName: string, avatarEmoji: string, autoBackupConfig?: AppData['autoBackupConfig'], defaultHomeScreen?: string, theme?: 'original') => void;
+  onUpdatePreferences: (
+    userName: string,
+    avatarEmoji: string,
+    autoBackupConfig?: AppData['autoBackupConfig'],
+    defaultHomeScreen?: string,
+    theme?: string,
+    avatarUrl?: string,
+    avatarBackgroundColor?: string
+  ) => void;
 }
 
 type SettingsTab = 'profile' | 'auto-backup' | 'data-safety' | 'changelog';
@@ -43,6 +52,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   appData,
   currentTheme = 'original',
   onExportData,
+  onExportNotes,
   onImportData,
   onClearAllData,
   onUpdatePreferences,
@@ -50,6 +60,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [userName, setUserName] = useState(appData.userPreferences?.userName || 'Ehsaan');
   const [avatarEmoji, setAvatarEmoji] = useState(appData.userPreferences?.avatarEmoji || '🌿');
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(appData.userPreferences?.avatarUrl);
+  const [avatarBackgroundColor, setAvatarBackgroundColor] = useState<string | undefined>(appData.userPreferences?.avatarBackgroundColor);
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
   const [defaultHomeScreen, setDefaultHomeScreen] = useState(appData.userPreferences?.defaultHomeScreen || 'today');
   const [isSaved, setIsSaved] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
@@ -253,9 +266,73 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const handleAvatarFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload a valid image file (PNG, JPEG, WEBP, SVG, or GIF).');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size exceeds 5MB. Please choose a smaller image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const rawDataUrl = event.target?.result as string;
+      if (!rawDataUrl) return;
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 320;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/png', 0.92);
+          setAvatarUrl(compressedDataUrl);
+        } else {
+          setAvatarUrl(rawDataUrl);
+        }
+      };
+      img.onerror = () => {
+        setAvatarUrl(rawDataUrl);
+      };
+      img.src = rawDataUrl;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveCustomAvatar = () => {
+    setAvatarUrl(undefined);
+    if (avatarFileInputRef.current) {
+      avatarFileInputRef.current.value = '';
+    }
+  };
+
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdatePreferences(userName.trim(), avatarEmoji, appData.autoBackupConfig, defaultHomeScreen);
+    onUpdatePreferences(userName.trim(), avatarEmoji, appData.autoBackupConfig, defaultHomeScreen, 'original', avatarUrl, avatarBackgroundColor);
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2000);
   };
@@ -361,88 +438,217 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* Tab Area Output */}
       <div className="grid grid-cols-1 gap-6">
-        {/* TAB 1: Profile preferences */}
+        {/* TAB 1: Profile & Avatar preferences */}
         {activeTab === 'profile' && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-6 shadow-xs">
-              <div className="flex items-center gap-2 mb-4 border-b border-[#281b18]/5 pb-3">
-                <User className="text-[#823b28]" size={18} />
-                <h3 className="text-md font-extrabold text-[#281b18] font-sans">
-                  Configure Personalization
-                </h3>
+            <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-6 sm:p-8 shadow-xs">
+              <div className="flex items-center justify-between border-b border-[#281b18]/10 pb-4 mb-6">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-[#823b28]/10 text-[#823b28]">
+                    <User size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-[#281b18] font-sans">
+                      Personal Avatar & Profile Identity
+                    </h3>
+                    <p className="text-xs text-[#823b28]/80 font-medium">
+                      Manage your avatar photo upload, emoji presets, and personal workspace greeting.
+                    </p>
+                  </div>
+                </div>
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider bg-[#edd8c2] text-[#823b28] px-3 py-1 rounded-full border border-[#281b18]/10">
+                  Profile Settings
+                </span>
               </div>
 
-              <form onSubmit={handleSaveProfile} className="space-y-4 max-w-md">
-                <div>
-                  <label className="block text-xs font-bold text-[#823b28] uppercase tracking-wider mb-1 font-mono">
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    className="w-full bg-[#f6e9d7] border border-[#281b18]/15 rounded-2xl px-4 py-2.5 text-xs font-bold text-[#281b18] outline-none focus:border-[#823b28] transition-colors"
-                  />
-                </div>
+              <form onSubmit={handleSaveProfile} className="space-y-8">
+                {/* DEDICATED AVATAR SELECTION & UPLOAD SECTION */}
+                <div className="bg-[#f6e9d7]/70 border border-[#281b18]/15 rounded-2xl p-5 sm:p-6 space-y-6 shadow-2xs">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#281b18]/10 pb-4">
+                    <div>
+                      <h4 className="text-sm font-extrabold text-[#281b18] font-sans flex items-center gap-2">
+                        <span>📷</span>
+                        <span>Avatar Selection & Photo Upload</span>
+                      </h4>
+                      <p className="text-xs text-[#823b28] mt-0.5 font-medium">
+                        Upload your custom photo or choose a preset emoji avatar.
+                      </p>
+                    </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-[#823b28] uppercase tracking-wider mb-1.5 font-mono">
-                    Select Avatar Emoji
-                  </label>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {['🌿', '⚡', '😊', '🎯', '📚', '🏃', '🎨', '🧩', '🌻', '☕'].map((emoji) => (
+                    {/* Hidden File Input */}
+                    <input
+                      type="file"
+                      ref={avatarFileInputRef}
+                      accept="image/*"
+                      onChange={handleAvatarFileUpload}
+                      className="hidden"
+                    />
+
+                    {/* Upload Avatar Button */}
+                    <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                       <button
-                        key={emoji}
                         type="button"
-                        onClick={() => setAvatarEmoji(emoji)}
-                        className={`w-10 h-10 rounded-xl text-lg flex items-center justify-center cursor-pointer transition-all border ${
-                          avatarEmoji === emoji
-                            ? 'bg-[#823b28] text-white border-transparent shadow-xs scale-105'
-                            : 'bg-[#f6e9d7]/60 hover:bg-[#f6e9d7] border-[#281b18]/10 text-[#281b18]'
-                        }`}
+                        onClick={() => avatarFileInputRef.current?.click()}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#df734c] hover:bg-[#c95f39] text-white text-xs font-extrabold transition-all shadow-sm active:scale-95 cursor-pointer border border-[#df734c]/30"
                       >
-                        {emoji}
+                        <Camera size={15} />
+                        <span>Upload Custom Photo</span>
                       </button>
-                    ))}
+
+                      {avatarUrl && (
+                        <button
+                          type="button"
+                          onClick={handleRemoveCustomAvatar}
+                          className="flex items-center gap-1.5 px-3 py-2.5 rounded-2xl bg-[#edd8c2] hover:bg-[#e3c4a7] text-[#823b28] text-xs font-bold transition-all border border-[#281b18]/15 cursor-pointer"
+                          title="Clear uploaded picture and use emoji avatar"
+                        >
+                          <Trash2 size={14} />
+                          <span>Remove Photo</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Avatar Preview & Live Card */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    {/* Live Avatar Preview */}
+                    <div className="flex items-center gap-4 bg-[#fbf6ef] p-4 rounded-2xl border border-[#281b18]/15 shadow-2xs">
+                      <div className="relative w-16 h-16 rounded-full overflow-hidden shrink-0 bg-[#823b28] text-white flex items-center justify-center text-2xl font-black shadow-md border-2 border-[#df734c]">
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
+                        ) : (
+                          <span>{avatarEmoji || '🌿'}</span>
+                        )}
+                        <span className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white" title="Active Avatar" />
+                      </div>
+
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-mono text-[10px] font-extrabold uppercase tracking-widest text-[#df734c]">
+                          Active Avatar
+                        </span>
+                        <span className="font-extrabold text-sm text-[#281b18] truncate font-sans">
+                          {userName || 'Ehsaan'}
+                        </span>
+                        <span className="text-[11px] text-[#823b28] font-medium truncate mt-0.5">
+                          {avatarUrl ? 'Custom Uploaded Photo' : `Emoji Avatar (${avatarEmoji})`}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Presets Grid + Background Color */}
+                    <div className="md:col-span-2 space-y-4">
+                      <div className="flex flex-wrap items-center gap-6">
+                        <div className="space-y-2 flex-1">
+                          <label className="block text-xs font-bold text-[#823b28] uppercase tracking-wider font-mono">
+                            Or Choose Emoji Avatar Preset
+                          </label>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {[
+                              '🌿', '⚡', '🧘', '🎯', '📚', '🎨', '🏆', '☕', 
+                              '🚀', '💡', '🎓', '🪐', '🕯️', '🔮', '🦊', '🦅', 
+                              '🦉', '🐯', '🦁', '🐉', '✨', '🌻', '🍁', '🌊'
+                            ].map((emoji) => (
+                              <button
+                                key={emoji}
+                                type="button"
+                                onClick={() => {
+                                  setAvatarEmoji(emoji);
+                                }}
+                                className={`w-10 h-10 rounded-xl text-lg flex items-center justify-center cursor-pointer transition-all border ${
+                                  avatarEmoji === emoji && !avatarUrl
+                                    ? 'bg-[#823b28] text-white border-transparent shadow-xs scale-110 ring-2 ring-[#df734c]'
+                                    : 'bg-[#fbf6ef] hover:bg-[#edd8c2] border-[#281b18]/15 text-[#281b18]'
+                                }`}
+                                title={`Select ${emoji}`}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Avatar Background Color Picker */}
+                        <div className="flex flex-col gap-2">
+                          <label className="text-xs font-bold text-[#823b28] uppercase tracking-wider font-mono">
+                            Bg Color
+                          </label>
+                          <input
+                            type="color"
+                            value={avatarBackgroundColor || '#823b28'}
+                            onChange={(e) => setAvatarBackgroundColor(e.target.value)}
+                            className="w-12 h-10 rounded-xl cursor-pointer border-2 border-[#281b18]/15 bg-transparent"
+                            title="Choose avatar background color"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-[#823b28]/70 font-mono pt-1">
+                        Note: Uploading a custom photo takes priority. Clicking &quot;Remove Photo&quot; reverts to your selected emoji preset.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-[#823b28] uppercase tracking-wider mb-1.5 font-mono">
-                    Default Home Screen Section
-                  </label>
-                  <select
-                    value={defaultHomeScreen}
-                    onChange={(e) => setDefaultHomeScreen(e.target.value)}
-                    className="w-full bg-[#f6e9d7] border border-[#281b18]/15 rounded-xl px-3 py-2.5 text-xs text-[#281b18] outline-none font-bold cursor-pointer"
-                  >
-                    <option value="today">📅 Today (Daily Command Center)</option>
-                    <option value="habits">🔁 Habits Tracker (Rituals & Analytics)</option>
-                    <option value="tasks">✅ Tasks (Outcome Manager)</option>
-                    <option value="calendar">📆 Calendar (Time-Blocking Agenda)</option>
-                    <option value="journal">📝 Journal (Reflections Log)</option>
-                    <option value="progress">📈 Progress (Meters & Tracking)</option>
-                    <option value="insights">💡 Insights (Pattern Observations)</option>
-                    <option value="settings">⚙️ Settings (System Preferences)</option>
-                  </select>
-                  <p className="text-[10px] text-[#823b28]/70 mt-1 font-mono">
-                    Ehsaan Flow will launch into this chosen section whenever the application reloads.
-                  </p>
+                {/* USER NAME & DEFAULT LAUNCH SECTION */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold text-[#823b28] uppercase tracking-wider mb-1.5 font-mono">
+                      Your Preferred Name
+                    </label>
+                    <input
+                      type="text"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder="e.g. Ehsaan"
+                      className="w-full bg-[#f6e9d7] border border-[#281b18]/15 rounded-2xl px-4 py-2.5 text-xs font-bold text-[#281b18] outline-none focus:border-[#823b28] focus:ring-1 focus:ring-[#823b28] transition-colors shadow-2xs h-11"
+                    />
+                    <p className="text-[10px] text-[#823b28]/70 mt-1 font-mono">
+                      Used in personalized greetings like &quot;Good day, {userName || 'User'}&quot;.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#823b28] uppercase tracking-wider mb-1.5 font-mono">
+                      Default Launch Screen
+                    </label>
+                    <select
+                      value={defaultHomeScreen}
+                      onChange={(e) => setDefaultHomeScreen(e.target.value)}
+                      className="w-full bg-[#f6e9d7] border border-[#281b18]/15 rounded-2xl px-3.5 py-2.5 text-xs text-[#281b18] outline-none font-bold cursor-pointer h-11 shadow-2xs"
+                    >
+                      <option value="today">📅 Today (Daily Command Center)</option>
+                      <option value="habits">🔁 Habits Tracker (Rituals & Analytics)</option>
+                      <option value="tasks">✅ Tasks (Outcome Manager)</option>
+                      <option value="notes">📝 Notes & Workspace (Docs & Ideas)</option>
+                      <option value="calendar">📆 Calendar (Time-Blocking Agenda)</option>
+                      <option value="journal">📖 Journal (Reflections Log)</option>
+                      <option value="progress">📈 Progress (Meters & Tracking)</option>
+                      <option value="insights">💡 Insights (Pattern Observations)</option>
+                      <option value="settings">⚙️ Settings (System Preferences)</option>
+                    </select>
+                    <p className="text-[10px] text-[#823b28]/70 mt-1 font-mono">
+                      Section loaded automatically whenever the application reloads.
+                    </p>
+                  </div>
                 </div>
 
-                <div className="pt-2">
+                {/* Save Submit Button */}
+                <div className="pt-4 border-t border-[#281b18]/10 flex items-center justify-between flex-wrap gap-4">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-2xl bg-[#823b28] hover:bg-[#6f2f1f] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2"
+                    className="px-6 py-3 rounded-2xl bg-[#823b28] hover:bg-[#6f2f1f] text-white text-xs font-extrabold transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-2 border border-[#a14c35]/40"
                   >
-                    {isSaved ? <Check size={14} /> : null}
-                    <span>{isSaved ? 'Preferences Saved!' : 'Save Profile Changes'}</span>
+                    {isSaved ? <Check size={16} className="text-emerald-400" /> : <User size={16} />}
+                    <span>{isSaved ? 'Profile & Avatar Saved!' : 'Save Profile Changes'}</span>
                   </button>
+
+                  {isSaved && (
+                    <span className="text-xs font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full animate-in fade-in duration-200">
+                      ✓ Profile details and avatar updated!
+                    </span>
+                  )}
                 </div>
               </form>
             </div>
-
-
 
             {/* Compact PWA Promotion */}
             <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -752,6 +958,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <Download size={15} />
                   <span>Download Manual JSON Export</span>
                 </button>
+                <button
+                  onClick={onExportNotes}
+                  className="flex-1 bg-[#823b28]/10 text-[#823b28] hover:bg-[#823b28]/20 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-md cursor-pointer flex items-center justify-center gap-2 transition-transform"
+                >
+                  <Download size={15} />
+                  <span>Download Notes-Only Export</span>
+                </button>
 
                 <label className="flex-1 bg-[#edd8c2] hover:bg-[#e3c4a7] text-[#281b18] px-4 py-2.5 rounded-2xl text-xs font-bold cursor-pointer flex items-center justify-center gap-2 border border-[#281b18]/15 transition-all">
                   <Upload size={15} />
@@ -834,16 +1047,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             >
               <Mail size={14} className="text-[#823b28] group-hover:scale-110 transition-transform" />
               <span>Contact Developer</span>
-            </a>
-            <a
-              href="https://github.com/ehsaanullah0/ehsaanflow"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-[#1e40af] hover:bg-[#1e3a8a] text-white border border-[#1e3a8a] px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-xs group"
-            >
-              <Github size={14} className="text-white group-hover:scale-110 transition-transform" />
-              <span>View Source</span>
-              <ExternalLink size={11} className="opacity-80" />
             </a>
             <button
               onClick={() => setShowSupportModal(true)}

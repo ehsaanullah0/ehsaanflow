@@ -415,7 +415,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 {subtasks.map((st) => (
                   <div
                     key={st.id}
-                    className="flex items-center justify-between gap-2 bg-[#f6e9d7] border border-[#281b18]/10 rounded-xl px-3 py-1.5 text-xs"
+                    className="flex items-center justify-between gap-2 bg-[#fbf6ef] border border-[#281b18]/15 rounded-xl px-3 py-1.5 text-xs shadow-2xs"
                   >
                     <span className="text-[#281b18] font-medium">{st.title}</span>
                     <button

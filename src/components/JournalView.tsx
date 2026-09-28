@@ -18,9 +18,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { JournalEntry } from '../types';
+import { HighlightText } from './HighlightText';
 
 interface JournalViewProps {
   journalEntries: JournalEntry[];
+  searchQuery: string;
   onOpenJournalModal: (entry?: JournalEntry | null, date?: string) => void;
   onDeleteJournal: (id: string) => void;
 }
@@ -35,11 +37,11 @@ const formatDateKey = (d: Date): string => {
 
 export const JournalView: React.FC<JournalViewProps> = ({
   journalEntries,
+  searchQuery,
   onOpenJournalModal,
   onDeleteJournal,
 }) => {
   const todayStr = formatDateKey(new Date());
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState<boolean>(false);
@@ -138,18 +140,7 @@ export const JournalView: React.FC<JournalViewProps> = ({
     <div className="flex flex-col gap-6 animate-in fade-in duration-300">
       {/* Top Controls & Action */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-4 shadow-sm">
-        {/* Search */}
-        <div className="relative flex-1 max-w-md w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#823b28]/60" size={16} />
-          <input
-            type="text"
-            id="journal-search-input"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search reflections & journal entries..."
-            className="w-full bg-[#f6e9d7] border border-[#281b18]/15 text-[#281b18] text-xs font-medium rounded-2xl pl-9 pr-3 py-2.5 outline-none focus:border-[#823b28]"
-          />
-        </div>
+
 
         {/* Tag Filters, Calendar Mode Toggle & New Entry Trigger */}
         <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
@@ -451,10 +442,10 @@ export const JournalView: React.FC<JournalViewProps> = ({
             {selectedDateEntry ? (
               <div className="flex flex-col gap-4">
                 <h3 className="text-lg font-bold text-[#281b18] font-sans">
-                  {selectedDateEntry.title}
+                  <HighlightText text={selectedDateEntry.title} highlight={searchQuery} />
                 </h3>
                 <p className="text-sm text-[#281b18] leading-relaxed whitespace-pre-line font-normal">
-                  {selectedDateEntry.content}
+                  <HighlightText text={selectedDateEntry.content} highlight={searchQuery} />
                 </p>
 
                 {selectedDateEntry.tags && selectedDateEntry.tags.length > 0 && (
@@ -548,13 +539,15 @@ export const JournalView: React.FC<JournalViewProps> = ({
                       </span>
                       <span>{entry.moodEmoji || '😊'}</span>
                     </div>
-                    <h5 className="text-xs font-extrabold truncate">{entry.title}</h5>
+                    <h5 className="text-xs font-extrabold truncate">
+                      <HighlightText text={entry.title} highlight={searchQuery} />
+                    </h5>
                     <p
                       className={`text-[11px] line-clamp-2 mt-1 leading-relaxed ${
                         isSelected ? 'text-[#eb9d7d]' : 'text-[#823b28]'
                       }`}
                     >
-                      {entry.content}
+                      <HighlightText text={entry.content} highlight={searchQuery} />
                     </p>
                   </div>
                 );

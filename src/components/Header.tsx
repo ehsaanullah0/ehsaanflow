@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Plus, BookOpen, X, Calendar, Sparkles } from 'lucide-react';
 import { NavSection } from '../types';
+import { AppLogo } from './AppLogo';
 
 interface HeaderProps {
   currentSection: NavSection;
@@ -9,6 +10,8 @@ interface HeaderProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
   userName: string;
+  avatarEmoji?: string;
+  avatarUrl?: string;
   onOpenEhsaanStudio?: () => void;
   theme?: 'original';
 }
@@ -20,6 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
   searchQuery,
   onSearchChange,
   userName,
+  avatarEmoji = '🌿',
+  avatarUrl,
   onOpenEhsaanStudio,
   theme = 'original',
 }) => {
@@ -76,27 +81,9 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between md:justify-start gap-2.5 mb-2 flex-wrap">
           {/* Mobile & Tablet App Brand Pill */}
           <button onClick={onOpenEhsaanStudio} className="lg:hidden flex items-center gap-1.5 bg-[#823b28] text-[#f6e9d7] px-3 py-1 rounded-full shadow-xs hover:opacity-90 transition-opacity cursor-pointer">
-            <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 512 512">
-              <rect width="512" height="512" rx="128" fill="#823b28"/>
-              <rect x="76" y="76" width="360" height="360" rx="150" fill="#df734c"/>
-              <g transform="translate(256, 256) rotate(35) scale(1.15)">
-                <path d="M 0,20 C -35,-5 -60,15 -50,45 C -40,75 -10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                <path d="M 0,20 C 35,-5 60,15 50,45 C 40,75 10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                <path d="M 0,-40 C -35,-65 -60,-45 -50,-15 C -40,15 -10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                <path d="M 0,-40 C 35,-65 60,-45 50,-15 C 40,15 10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                <path d="M 0,-90 C -18,-115 -18,-150 0,-155 C 18,-150 18,-115 0,-90 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                <path d="M 0,105 L 0,-95" fill="none" stroke="#000000" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,35 L -25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,35 L 25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,-25 L -25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,-25 L 25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,105 L 0,-95" fill="none" stroke="#a3e635" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,35 L -25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,35 L 25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,-25 L -25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 0,-25 L 25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-              </g>
-            </svg>
+            <div className="w-4.5 h-4.5 shrink-0 overflow-hidden">
+              <AppLogo idPrefix="header-mobile" className="w-full h-full" />
+            </div>
             <span className="font-extrabold text-xs font-sans tracking-tight">EHSAAN FLOW</span>
           </button>
 
@@ -118,8 +105,8 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Action Controls Wrapped in Semi-Transparent Card Container */}
-      {currentSection !== 'settings' && (
-        <div className="bg-[#fbf6ef]/80 backdrop-blur-xs border border-[#281b18]/15 rounded-3xl p-2 sm:p-2.5 shadow-sm flex items-center gap-2 sm:gap-2.5 w-full md:w-auto flex-wrap sm:flex-nowrap">
+      {currentSection !== 'settings' && currentSection !== 'today' && (
+        <div className="bg-[#fbf6ef] border border-[#281b18]/10 rounded-3xl p-3 sm:p-4 shadow-md shadow-[#823b28]/5 flex items-center gap-2 sm:gap-2.5 w-full md:w-auto flex-wrap sm:flex-nowrap">
           {/* Search Input */}
           <div className="relative flex-1 sm:w-60 min-w-[150px]">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#823b28]/60" size={15} />

@@ -1,4 +1,4 @@
-import { AppData, Task, JournalEntry, ProgressMeter } from '../types';
+import { AppData, Task, JournalEntry, ProgressMeter, Note } from '../types';
 import { getInitialSeedData } from '../data/seedData';
 
 const STORAGE_KEY = 'ehsaan_flow_app_data_v1';
@@ -58,6 +58,19 @@ export const exportDataAsJSON = (data: AppData): void => {
   const link = document.createElement('a');
   link.href = url;
   link.download = `ehsaan_flow_backup_${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+export const exportNotesAsJSON = (notes: Note[] | undefined): void => {
+  const jsonStr = JSON.stringify(notes || [], null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `ehsaan_flow_notes_backup_${new Date().toISOString().split('T')[0]}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

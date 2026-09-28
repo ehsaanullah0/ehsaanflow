@@ -18,26 +18,73 @@ import {
 } from 'lucide-react';
 import { Note } from '../types';
 import { HighlightText } from './HighlightText';
+import { NoteContentRenderer } from './NoteContentRenderer';
+import { NoteDetailModal } from './NoteDetailModal';
 
 interface NotesViewProps {
   notes: Note[];
+  searchQuery: string;
   onOpenNewNoteModal: () => void;
   onEditNote: (note: Note) => void;
   onDeleteNote: (noteId: string) => void;
   onTogglePinNote: (noteId: string) => void;
+  onSaveNote?: (noteData: Omit<Note, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }) => void;
 }
 
 export const NotesView: React.FC<NotesViewProps> = ({
   notes = [],
+  searchQuery,
   onOpenNewNoteModal,
   onEditNote,
   onDeleteNote,
   onTogglePinNote,
+  onSaveNote,
 }) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    const saved = localStorage.getItem('ehsaan_flow_notes_view_mode');
+    return saved === 'list' || saved === 'grid' ? saved : 'grid';
+  });
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    return localStorage.getItem('ehsaan_flow_notes_selected_category') || 'all';
+  });
   const [copiedNoteId, setCopiedNoteId] = useState<string | null>(null);
+  const [localSearch, setLocalSearch] = useState<string>(searchQuery);
+  const [activeViewingNote, setActiveViewingNote] = useState<Note | null>(() => {
+    const savedId = localStorage.getItem('ehsaan_flow_active_viewing_note_id');
+    if (savedId) {
+      const found = notes.find((n) => n.id === savedId);
+      if (found) return found;
+    }
+    return null;
+  });
+
+  const handleSetViewMode = (mode: 'grid' | 'list') => {
+    setViewMode(mode);
+    localStorage.setItem('ehsaan_flow_notes_view_mode', mode);
+  };
+
+  const handleSelectCategory = (cat: string) => {
+    setSelectedCategory(cat);
+    localStorage.setItem('ehsaan_flow_notes_selected_category', cat);
+  };
+
+  const handleOpenViewingNote = (note: Note) => {
+    setActiveViewingNote(note);
+    localStorage.setItem('ehsaan_flow_active_viewing_note_id', note.id);
+  };
+
+  const handleCloseViewingNote = () => {
+    setActiveViewingNote(null);
+    localStorage.removeItem('ehsaan_flow_active_viewing_note_id');
+  };
+
+  const currentViewingNote = activeViewingNote
+    ? notes.find((n) => n.id === activeViewingNote.id) || activeViewingNote
+    : null;
+
+  React.useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
 
   // Extract all categories
   const categories = React.useMemo(() => {
@@ -50,7 +97,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
 
   // Filter notes
   const filteredNotes = notes.filter((n) => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = localSearch.trim().toLowerCase();
     const matchesQuery =
       !query ||
       n.title.toLowerCase().includes(query) ||
@@ -77,6 +124,21 @@ export const NotesView: React.FC<NotesViewProps> = ({
     setTimeout(() => {
       setCopiedNoteId(null);
     }, 2000);
+  };
+
+  const handleToggleCheckbox = (note: Note, lineIndex: number, newChecked: boolean) => {
+    if (!onSaveNote) return;
+    const lines = note.content.split('\n');
+    if (lines[lineIndex] !== undefined) {
+      lines[lineIndex] = lines[lineIndex].replace(
+        /^(\s*-\s*\[)[ xX](\]\s*.*)$/,
+        `$1${newChecked ? 'x' : ' '}$2`
+      );
+      onSaveNote({
+        ...note,
+        content: lines.join('\n'),
+      });
+    }
   };
 
   const formatDate = (isoStr: string) => {
@@ -124,7 +186,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
             <div className="bg-[#f6e9d7] border border-[#281b18]/15 p-1 rounded-2xl flex items-center gap-1 shadow-2xs">
               <button
                 type="button"
-                onClick={() => setViewMode('grid')}
+                onClick={() => handleSetViewMode('grid')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   viewMode === 'grid'
                     ? 'bg-[#823b28] text-[#f6e9d7] shadow-2xs'
@@ -137,7 +199,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode('list')}
+                onClick={() => handleSetViewMode('list')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   viewMode === 'list'
                     ? 'bg-[#823b28] text-[#f6e9d7] shadow-2xs'
@@ -168,15 +230,15 @@ export const NotesView: React.FC<NotesViewProps> = ({
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#823b28]/60" size={15} />
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
               placeholder="Search notes by title, content, or #tags..."
               className="w-full bg-[#f6e9d7] border border-[#281b18]/15 text-[#281b18] placeholder-[#823b28]/50 text-xs font-semibold rounded-2xl pl-9 pr-8 py-2.5 outline-none focus:border-[#823b28] focus:ring-1 focus:ring-[#823b28] transition-all shadow-2xs h-10"
             />
-            {searchQuery && (
+            {localSearch && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={() => setLocalSearch('')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#823b28]/60 hover:text-[#823b28] p-1 cursor-pointer transition-colors"
                 title="Clear search"
               >
@@ -188,7 +250,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
           {/* Category Filter Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scrollbar-none shrink-0">
             <button
-              onClick={() => setSelectedCategory('all')}
+              onClick={() => handleSelectCategory('all')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap border ${
                 selectedCategory === 'all'
                   ? 'bg-[#823b28] text-[#f6e9d7] border-[#823b28]'
@@ -202,7 +264,7 @@ export const NotesView: React.FC<NotesViewProps> = ({
               return (
                 <button
                   key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => handleSelectCategory(cat)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap border ${
                     selectedCategory.toLowerCase() === cat.toLowerCase()
                       ? 'bg-[#823b28] text-[#f6e9d7] border-[#823b28]'
@@ -261,9 +323,11 @@ export const NotesView: React.FC<NotesViewProps> = ({
                       searchQuery={searchQuery}
                       copiedNoteId={copiedNoteId}
                       onCopyNote={handleCopyNote}
+                      onViewNote={handleOpenViewingNote}
                       onEditNote={onEditNote}
                       onDeleteNote={onDeleteNote}
                       onTogglePinNote={onTogglePinNote}
+                      onToggleCheckbox={handleToggleCheckbox}
                       formatDate={formatDate}
                     />
                   ))}
@@ -277,9 +341,11 @@ export const NotesView: React.FC<NotesViewProps> = ({
                       searchQuery={searchQuery}
                       copiedNoteId={copiedNoteId}
                       onCopyNote={handleCopyNote}
+                      onViewNote={handleOpenViewingNote}
                       onEditNote={onEditNote}
                       onDeleteNote={onDeleteNote}
                       onTogglePinNote={onTogglePinNote}
+                      onToggleCheckbox={handleToggleCheckbox}
                       formatDate={formatDate}
                     />
                   ))}
@@ -308,9 +374,11 @@ export const NotesView: React.FC<NotesViewProps> = ({
                       searchQuery={searchQuery}
                       copiedNoteId={copiedNoteId}
                       onCopyNote={handleCopyNote}
+                      onViewNote={handleOpenViewingNote}
                       onEditNote={onEditNote}
                       onDeleteNote={onDeleteNote}
                       onTogglePinNote={onTogglePinNote}
+                      onToggleCheckbox={handleToggleCheckbox}
                       formatDate={formatDate}
                     />
                   ))}
@@ -324,9 +392,11 @@ export const NotesView: React.FC<NotesViewProps> = ({
                       searchQuery={searchQuery}
                       copiedNoteId={copiedNoteId}
                       onCopyNote={handleCopyNote}
+                      onViewNote={handleOpenViewingNote}
                       onEditNote={onEditNote}
                       onDeleteNote={onDeleteNote}
                       onTogglePinNote={onTogglePinNote}
+                      onToggleCheckbox={handleToggleCheckbox}
                       formatDate={formatDate}
                     />
                   ))}
@@ -336,6 +406,23 @@ export const NotesView: React.FC<NotesViewProps> = ({
           )}
         </div>
       )}
+
+      {/* Pure Full-Screen Note Reader Modal (NO Edit Panel) */}
+      <NoteDetailModal
+        note={currentViewingNote}
+        isOpen={!!activeViewingNote}
+        onClose={handleCloseViewingNote}
+        onEdit={(noteToEdit) => {
+          handleCloseViewingNote();
+          onEditNote(noteToEdit);
+        }}
+        onDelete={(noteId) => {
+          handleCloseViewingNote();
+          onDeleteNote(noteId);
+        }}
+        onTogglePin={onTogglePinNote}
+        onSaveNote={onSaveNote}
+      />
     </div>
   );
 };
@@ -349,14 +436,29 @@ const getContrastColor = (hex: string) => {
   return brightness > 125 ? '#281b18' : '#fbf6ef';
 };
 
+interface NoteCardProps {
+  note: Note;
+  searchQuery: string;
+  copiedNoteId: string | null;
+  onCopyNote: (note: Note, e: React.MouseEvent) => void;
+  onViewNote: (note: Note) => void;
+  onEditNote: (note: Note) => void;
+  onDeleteNote: (noteId: string) => void;
+  onTogglePinNote: (noteId: string) => void;
+  onToggleCheckbox?: (note: Note, lineIndex: number, newChecked: boolean) => void;
+  formatDate: (isoString: string) => string;
+}
+
 const NoteCard: React.FC<NoteCardProps> = ({
   note,
   searchQuery,
   copiedNoteId,
   onCopyNote,
+  onViewNote,
   onEditNote,
   onDeleteNote,
   onTogglePinNote,
+  onToggleCheckbox,
   formatDate,
 }) => {
   const cardBgColor = note.color || '#fbf6ef';
@@ -365,7 +467,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
 
   return (
     <div
-      onClick={() => onEditNote(note)}
+      onClick={() => onViewNote(note)}
       style={{ backgroundColor: cardBgColor, color: textColor }}
       className={`group relative rounded-3xl p-5 border border-[#281b18]/15 hover:border-[#823b28]/50 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col justify-between min-h-[280px] overflow-hidden`}
     >
@@ -408,15 +510,20 @@ const NoteCard: React.FC<NoteCardProps> = ({
           <HighlightText text={note.title} highlight={searchQuery} />
         </h3>
 
-        {/* Note Excerpt */}
-        <p style={{ color: `${textColor}cc` }} className="text-xs font-medium leading-relaxed line-clamp-4 whitespace-pre-wrap">
-          <HighlightText text={note.content} highlight={searchQuery} />
-        </p>
+        {/* Note Content / Interactive Checklists */}
+        <div style={{ color: `${textColor}cc` }} className="text-xs font-medium leading-relaxed max-h-44 overflow-y-auto pr-1">
+          <NoteContentRenderer
+            content={note.content}
+            searchQuery={searchQuery}
+            onToggleCheckbox={onToggleCheckbox ? (idx, checked) => onToggleCheckbox(note, idx, checked) : undefined}
+            isCompact={true}
+          />
+        </div>
 
         {/* Tags list */}
         {note.tags && note.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-3">
-            {note.tags.map((t) => (
+            {note.tags.map((t: string) => (
               <span
                 key={t}
                 style={{ backgroundColor: `${textColor}20` }}
@@ -490,9 +597,11 @@ const NoteListItem: React.FC<NoteCardProps> = ({
   searchQuery,
   copiedNoteId,
   onCopyNote,
+  onViewNote,
   onEditNote,
   onDeleteNote,
   onTogglePinNote,
+  onToggleCheckbox,
   formatDate,
 }) => {
   const cardBgColor = note.color || '#fbf6ef';
@@ -501,7 +610,7 @@ const NoteListItem: React.FC<NoteCardProps> = ({
 
   return (
     <div
-      onClick={() => onEditNote(note)}
+      onClick={() => onViewNote(note)}
       style={{ backgroundColor: cardBgColor, color: textColor }}
       className="group rounded-2xl p-5 border border-[#281b18]/15 hover:border-[#823b28]/50 shadow-2xs transition-all duration-200 cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 min-h-[90px]"
     >
@@ -531,9 +640,14 @@ const NoteListItem: React.FC<NoteCardProps> = ({
               </span>
             )}
           </div>
-          <p style={{ color: `${textColor}cc` }} className="text-sm font-medium line-clamp-2 mt-1">
-            <HighlightText text={note.content} highlight={searchQuery} />
-          </p>
+          <div style={{ color: `${textColor}cc` }} className="text-sm font-medium line-clamp-3 mt-1">
+            <NoteContentRenderer
+              content={note.content}
+              searchQuery={searchQuery}
+              onToggleCheckbox={onToggleCheckbox ? (idx, checked) => onToggleCheckbox(note, idx, checked) : undefined}
+              isCompact={true}
+            />
+          </div>
         </div>
       </div>
 

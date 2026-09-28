@@ -21,6 +21,7 @@ import { formatDateStr } from '../utils/habitUtils';
 
 interface HabitsViewProps {
   habits: Habit[];
+  searchQuery: string;
   onToggleHabitDate: (habitId: string, dateStr: string) => void;
   onOpenNewHabitModal: () => void;
   onOpenAnalyticsModal: (habit?: Habit) => void;
@@ -31,6 +32,7 @@ interface HabitsViewProps {
 
 export const HabitsView: React.FC<HabitsViewProps> = ({
   habits,
+  searchQuery,
   onToggleHabitDate,
   onOpenNewHabitModal,
   onOpenAnalyticsModal,
@@ -42,7 +44,6 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
   const [isReorderMode, setIsReorderMode] = useState<boolean>(false);
   const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const todayStr = formatDateStr(new Date());
 
@@ -201,18 +202,6 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
             </button>
           ))}
         </div>
-
-        {/* Quick Search */}
-        <div className="relative min-w-[180px] sm:w-56">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#823b28]/60" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search habits..."
-            className="w-full bg-[#f6e9d7] border border-[#281b18]/15 rounded-2xl pl-8 pr-3 py-1.5 text-xs text-[#281b18] placeholder-[#823b28]/50 outline-none focus:border-[#823b28]"
-          />
-        </div>
       </div>
 
       {/* Reordering Banner Notification (if active) */}
@@ -264,6 +253,7 @@ export const HabitsView: React.FC<HabitsViewProps> = ({
             <HabitCard
               key={habit.id}
               habit={habit}
+              searchQuery={searchQuery}
               todayStr={todayStr}
               isCompactMode={isCompactMode}
               isReorderMode={isReorderMode}

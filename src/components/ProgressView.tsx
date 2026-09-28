@@ -3,6 +3,8 @@ import { Activity, Plus, TrendingUp, Calendar, Trash2, Edit3, X, Check, BarChart
 import { ProgressMeter, MeasurementType } from '../types';
 import { ProgressMeterCard } from './ProgressMeterCard';
 import { ProgressDetailsModal } from './ProgressDetailsModal';
+import { OverallProgressAnalyticsModal } from './OverallProgressAnalyticsModal';
+import { ErrorBoundary } from './ErrorBoundary';
 
 interface ProgressViewProps {
   progressMeters: ProgressMeter[];
@@ -18,6 +20,7 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
   onUpdateMeterValue,
 }) => {
   const [selectedMeterForDetails, setSelectedMeterForDetails] = useState<ProgressMeter | null>(null);
+  const [isOverallModalOpen, setIsOverallModalOpen] = useState(false);
   const [isNewMeterModalOpen, setIsNewMeterModalOpen] = useState(false);
 
   // Form states for creating new meter
@@ -62,10 +65,18 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
           </h2>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-          <span className="font-mono text-xs text-[#823b28]/70 hidden md:inline">
-            Tap any card to open detailed linear charts & matrix
-          </span>
+        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+          {progressMeters.length > 0 && (
+            <button
+              id="open-overall-analytics-btn"
+              onClick={() => setIsOverallModalOpen(true)}
+              className="flex items-center gap-1.5 bg-[#edd8c2] hover:bg-[#e3c4a7] text-[#823b28] border border-[#823b28]/20 px-3.5 sm:px-4 py-2 rounded-2xl text-xs font-bold shadow-2xs cursor-pointer whitespace-nowrap transition-all"
+              title="Open System-wide Overall Progress Analytics Command Center"
+            >
+              <BarChart2 size={15} />
+              <span>Overall Analytics</span>
+            </button>
+          )}
 
           <button
             id="create-meter-btn"
@@ -106,6 +117,24 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
             />
           ))}
         </div>
+      )}
+
+      {/* Full-Screen Overall Progress Analytics Command Center Modal */}
+      {isOverallModalOpen && (
+        <ErrorBoundary
+          fallbackTitle="Overall Progress Analytics Self-Recovery"
+          onReset={() => setIsOverallModalOpen(false)}
+        >
+          <OverallProgressAnalyticsModal
+            isOpen={isOverallModalOpen}
+            onClose={() => setIsOverallModalOpen(false)}
+            meters={progressMeters}
+            onSelectMeter={(m) => {
+              setIsOverallModalOpen(false);
+              setSelectedMeterForDetails(m);
+            }}
+          />
+        </ErrorBoundary>
       )}
 
       {/* Rich Popup Details Modal */}

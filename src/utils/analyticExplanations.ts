@@ -142,6 +142,23 @@ export const ANALYTIC_EXPLANATIONS: Record<string, AnalyticExplanation> = {
     tips: ['Never miss twice in a row—a single miss is an accident, two misses is a new habit.'],
   },
 
+  calendarWorkloadSummary: {
+    category: 'CALENDAR ANALYTICS',
+    title: 'Selected Date Workload & Status',
+    formula: 'Workload State = Scheduled Tasks Count | Journal Status | Capacity Load (≥4 Tasks = Overloaded)',
+    description: 'Provides a comprehensive breakdown of scheduled outcomes, priority distribution, journal reflection status, and capacity load for the selected calendar date.',
+    dataPoints: [
+      'Tasks scheduled on selected date (due, recurring, or duration range)',
+      'Journal entries matching selected date',
+      'Task priority weights (high, medium, low)'
+    ],
+    example: 'If 5 tasks are scheduled on October 12, the Day Workload indicator flags an Overloaded capacity alert.',
+    tips: [
+      'Spread high-priority outcomes across multiple days to avoid overload peaks.',
+      'Log daily journal reflections to maintain emotional and mental clarity.'
+    ],
+  },
+
   productivityMomentumScore: {
     category: 'HOLISTIC PERFORMANCE',
     title: 'Productivity Momentum Index',

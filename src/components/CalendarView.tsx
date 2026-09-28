@@ -14,34 +14,47 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react';
-import { Task, JournalEntry, ProgressMeter } from '../types';
+import { Task, JournalEntry, ProgressMeter, Habit } from '../types';
+import { getMonthDays, getTodayKey } from '../utils/dateUtils';
 import { isTaskCompletedOnDate } from '../utils/habitUtils';
+import { AnalyticInfoButton } from './AnalyticInfoModal';
+import { ANALYTIC_EXPLANATIONS } from '../utils/analyticExplanations';
 
 interface CalendarViewProps {
   tasks: Task[];
+  habits: Habit[];
   journalEntries: JournalEntry[];
   progressMeters: ProgressMeter[];
   onToggleTaskComplete: (taskId: string, dateStr?: string) => void;
   onToggleSubtaskComplete?: (taskId: string, subtaskId: string) => void;
   onOpenNewTaskModal: () => void;
   onOpenJournalModal: (entry?: JournalEntry | null, date?: string) => void;
+  onToggleHabitDate: (habitId: string, dateStr: string) => void;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({
   tasks,
+  habits,
   journalEntries,
   progressMeters,
   onToggleTaskComplete,
   onToggleSubtaskComplete,
   onOpenNewTaskModal,
   onOpenJournalModal,
+  onToggleHabitDate,
 }) => {
   const [viewMode, setViewMode] = useState<'calendar' | 'agenda'>('calendar');
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDateStr, setSelectedDateStr] = useState<string>(
-    new Date().toISOString().split('T')[0]
+    getTodayKey()
   );
   const [expandedTaskIds, setExpandedTaskIds] = useState<Record<string, boolean>>({});
+
+
+  // Habits for Selected Date
+  const activeHabits = habits.filter(h => h.startDate <= selectedDateStr && !h.isArchived);
+  const completedHabits = activeHabits.filter(h => h.completedDates.includes(selectedDateStr));
+  const missedHabits = activeHabits.filter(h => !h.completedDates.includes(selectedDateStr) && selectedDateStr < getTodayKey());
 
   const toggleExpandSubtasks = (taskId: string) => {
     setExpandedTaskIds((prev) => ({
@@ -70,42 +83,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   // Generate calendar days for month grid
-  const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 = Sun
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysGrid = getMonthDays(year, month);
 
-  const daysGrid: ({ dateStr: string; dayNum: number; isCurrentMonth: boolean })[] = [];
 
-  // Previous month trailing padding
-  const prevMonthDays = new Date(year, month, 0).getDate();
-  for (let i = firstDayOfMonth - 1; i >= 0; i--) {
-    const d = new Date(year, month - 1, prevMonthDays - i);
-    daysGrid.push({
-      dateStr: d.toISOString().split('T')[0],
-      dayNum: prevMonthDays - i,
-      isCurrentMonth: false,
-    });
-  }
 
-  // Current month days
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateObj = new Date(year, month, d);
-    daysGrid.push({
-      dateStr: dateObj.toISOString().split('T')[0],
-      dayNum: d,
-      isCurrentMonth: true,
-    });
-  }
-
-  // Next month leading padding to fill 35 or 42 grid cells
-  const remainingCells = (7 - (daysGrid.length % 7)) % 7;
-  for (let i = 1; i <= remainingCells; i++) {
-    const d = new Date(year, month + 1, i);
-    daysGrid.push({
-      dateStr: d.toISOString().split('T')[0],
-      dayNum: i,
-      isCurrentMonth: false,
-    });
-  }
 
   // Helper to check if task falls on date
   const isTaskOnDate = (task: Task, dateStr: string) => {
@@ -254,9 +235,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       </div>
 
       {viewMode === 'calendar' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
-          {/* Main Month Grid (2 cols) */}
-          <div className="lg:col-span-2 bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-3.5 sm:p-5 shadow-sm flex flex-col">
+        <div className="flex flex-col gap-5 sm:gap-6">
+          {/* Main Month Grid (Full Width) */}
+          <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-3.5 sm:p-5 shadow-sm flex flex-col">
             {/* Weekday Labels */}
             <div className="grid grid-cols-7 text-center font-mono text-[10px] sm:text-[11px] font-bold text-[#823b28] uppercase border-b border-[#281b18]/10 pb-2.5 mb-2">
               <span>Sun</span>
@@ -280,7 +261,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     return weightB - weightA;
                   });
                 const isSelected = selectedDateStr === cell.dateStr;
-                const isToday = cell.dateStr === new Date().toISOString().split('T')[0];
+                const isToday = cell.dateStr === getTodayKey();
                 const hasJournal = journalEntries.some((j) => j.date === cell.dateStr);
                 const isOverloaded = dayTasks.length >= 4;
 
@@ -305,7 +286,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                           isSelected ? 'text-[#f6e9d7]' : 'text-[#281b18]'
                         }`}
                       >
-                        {cell.dayNum}
+                        {cell.dayNumber}
                       </span>
 
                       {/* Icons for Journal or Overloaded warning */}
@@ -364,19 +345,29 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             </div>
           </div>
 
-          {/* Selected Date Details Column */}
+          {/* Selected Date Details Section (Below Calendar) */}
           <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col gap-4">
-            <div>
-              <span className="font-mono text-[10px] uppercase font-bold text-[#823b28] tracking-widest">
-                SELECTED DATE AGENDA
-              </span>
-              <h3 className="text-lg sm:text-xl font-extrabold text-[#281b18] font-sans">
-                {new Date(selectedDateStr + 'T00:00:00').toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </h3>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-mono text-[10px] uppercase font-bold text-[#823b28] tracking-widest">
+                  SELECTED DATE AGENDA
+                </span>
+                <h3 className="text-lg sm:text-xl font-extrabold text-[#281b18] font-sans">
+                  {new Date(selectedDateStr + 'T00:00:00').toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </h3>
+              </div>
+              <AnalyticInfoButton
+                explanation={{
+                  ...ANALYTIC_EXPLANATIONS.calendarWorkloadSummary,
+                  title: `${selectedDateStr} Workload & Status`,
+                  currentValue: `Tasks: ${selectedDateTasks.length} | Journal: ${selectedDateJournal ? 'Logged' : 'None'} | Overload: ${selectedDateTasks.length >= 4 ? 'Yes (Overloaded)' : 'Normal'}`,
+                }}
+                variant="icon"
+              />
             </div>
 
             {/* Tasks for Selected Date */}
@@ -398,7 +389,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   No tasks scheduled for this date.
                 </p>
               ) : (
-                <div className="flex flex-col gap-2 max-h-56 sm:max-h-64 overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pr-1">
                   {selectedDateTasks.map((t) => {
                     const isCompleted = isTaskCompletedOnDate(t, selectedDateStr);
                     return (
@@ -470,6 +461,50 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     </div>
                   );
                 })}
+                </div>
+              )}
+
+              {/* Detailed Habits Overview */}
+              {activeHabits.length > 0 && (
+                <div className="mb-4 p-4 bg-[#edd8c2]/30 border border-[#281b18]/10 rounded-3xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-[#823b28]">Habit Status</span>
+                    <span className="text-[10px] font-bold text-[#823b28]/60 uppercase tracking-widest">
+                      {completedHabits.length} Done / {missedHabits.length} Missed
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Completed Column */}
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-bold text-[#22c55e] uppercase">Completed</p>
+                      {completedHabits.length > 0 ? (
+                        completedHabits.map(h => (
+                          <button key={h.id} onClick={() => onToggleHabitDate(h.id, selectedDateStr)} className="flex items-center gap-2 w-full p-2 bg-[#f6e9d7]/70 rounded-xl hover:bg-[#f6e9d7] transition-colors">
+                            <CheckCircle2 size={14} className="text-[#22c55e]" />
+                            <span className="text-xs font-medium text-[#281b18] truncate">{h.name}</span>
+                          </button>
+                        ))
+                      ) : (
+                        <p className="text-[10px] text-[#823b28]/50 italic p-2">None</p>
+                      )}
+                    </div>
+
+                    {/* Missed Column */}
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-bold text-[#df734c] uppercase">Missed</p>
+                      {missedHabits.length > 0 ? (
+                        missedHabits.map(h => (
+                          <button key={h.id} onClick={() => onToggleHabitDate(h.id, selectedDateStr)} className="flex items-center gap-2 w-full p-2 bg-[#f6e9d7]/70 rounded-xl hover:bg-[#f6e9d7] transition-colors">
+                            <Circle size={14} className="text-[#df734c]" />
+                            <span className="text-xs font-medium text-[#281b18] truncate">{h.name}</span>
+                          </button>
+                        ))
+                      ) : (
+                        <p className="text-[10px] text-[#823b28]/50 italic p-2">None</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 

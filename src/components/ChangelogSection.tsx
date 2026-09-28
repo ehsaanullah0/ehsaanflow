@@ -18,15 +18,184 @@ export const ChangelogSection: React.FC<ChangelogSectionProps> = ({ onOpenSuppor
 
   const changelogData: VersionLog[] = [
     {
+      version: 'v1.2.9',
+      title: 'Minimalist UX & Personalization Enhancements',
+      date: 'September 27, 2026',
+      isLatest: true,
+      items: [
+        'Added Avatar Background Color Picker in Settings for custom personalization.',
+        'Removed black background overlay from QR support modal for a cleaner, integrated look.',
+        'Streamlined QR support modal header for a more minimalist design.',
+        'Cleaned up Ehsaan Studio by removing Project Hub and Footer Support banners.',
+        'Streamlined Today Page header by removing the Journal entry shortcut.',
+        'Simplified Today Page header graphics by removing decorative flower branch.',
+        'Removed "Principle of the Day" quote section for a more focused layout.',
+        'Enhanced overall UI consistency for a cleaner, minimalist aesthetic.',
+      ],
+    },
+    {
+      version: 'v1.2.8',
+      title: 'Translucent Stats Wrapper Card & Premium Framing Overhaul',
+      date: 'September 27, 2026',
+      isLatest: false,
+      items: [
+        'Translucent Stats Wrapper Card: Wrapped the grid of four beautiful stats cards inside a subtle, premium translucent background container with a delicate border (bg-[#fbf6ef]/40 backdrop-blur-sm).',
+        'Enhanced Contrast & Layout: Heightened contrast, framing, and visual depth for the Tasks Today, Streak, Completion Rate, and Focus metrics across all viewports.',
+      ],
+    },
+    {
+      version: 'v1.2.7',
+      title: 'Frameless Header Aesthetics & Workspace Profile Personalization Sync',
+      date: 'September 27, 2026',
+      isLatest: false,
+      items: [
+        'Frameless Header Layout: Removed the enclosing background card and border from the Today Page header area, allowing the elements to float directly on the page background.',
+        'Top App Icon Personalization: Synchronized your active Settings avatar (custom uploaded image or emoji preset) directly into the Sidebar top-left app icon.',
+        'Removed Today Page Customizer: Cleaned up Today Page layout by removing the local avatar picker drawer and avatar upload buttons, keeping customization centralized in Settings.',
+        'Float Date & Overdue Badges: Grouped the pill-shaped Date badge and live "Overdue tasks" indicator for a clean, unified meta row.',
+      ],
+    },
+    {
+      version: 'v1.2.6',
+      title: 'Today Command Center Redesign & Unified Landscape Header Integration',
+      date: 'September 27, 2026',
+      isLatest: false,
+      items: [
+        'Unified Landscape Header: Created a gorgeous, wide cream-toned top header banner spanning the entire Today Page.',
+        'Aesthetic Rolling Hills Artwork: Rendered a beautiful, organic sun & rolling hills plant vector illustration seamlessly within the premium organic color palette.',
+        'Uppercase Greeting Title: Styled the greeting statement in bold, fully capitalized "Good day, EHSAAN 🌿" layout.',
+        'Pill-Shaped Date Badge: Formatted the compact calendar icon and date badge inside a rounded-full floating pill.',
+        'Inlined Action Controls: Relocated the Search bar, Studio wizard, + New Task, and Journal buttons inside the Today Page header banner.',
+        'Four Stats Grid Cards: Re-engineered the stats cards into a premium horizontal layout (Tasks Today, Streak, Completion Rate, Focus).',
+        'Checkmark, Flame, Target, Star Icons: Customized each stats circle container with custom colored ring gradients.',
+      ],
+    },
+    {
+      version: 'v1.2.5',
+      title: 'Mindful Today Avatar Hero Banner & Uncluttered Navigation Overhaul',
+      date: 'September 27, 2026',
+      isLatest: false,
+      items: [
+        'Removed Sidebar Profile Card: Cleaned up sidebar footer navigation by removing redundant profile badge for streamlined, uncluttered navigation.',
+        'Today Page Hero Avatar Section: Integrated a high-impact, warm organic Avatar Identity Card inside the Today Page command center.',
+        'Direct Photo Upload Overlay: Embedded a camera upload trigger directly on the Today Page avatar preview with real-time canvas compression.',
+        'Inline Quick Avatar Customizer: Built a collapsible avatar customization drawer right on the Today Page with quick preset emoji selectors.',
+        'Personalized Greeting Header: Enhanced the "Good day, Ehsaan" welcome banner with warm squircle borders, status ring, and focus stats.',
+        'Removed Redundant Header Avatar Pill: Extracted the unnecessary profile/avatar capsule next to the date badge in the top header, preserving a clean, minimalist and aesthetic toolbar.',
+      ],
+    },
+    {
+      version: 'v1.2.4',
+      title: 'Exact Brand Logo Identity & Multi-Platform PWA/Favicon Overhaul',
+      date: 'September 27, 2026',
+      isLatest: false,
+      items: [
+        'Exact Brand Logo Identity: Seamlessly implemented the official brand logo featuring the elegant white monoline leaf and flowing wave seedling emblem with 100% geometric and aesthetic fidelity.',
+        'Authentic Warm Colour Science: Implemented the exact dual-gradient color science with deep roasted mocha-espresso (#562814 to #6d3319) transitioning into radiant warm amber and honey terracotta (#cb6222 to #ea7d27) with subtle organic depth waves.',
+        'Vector SVG Master Assets: Updated /public/icon.svg and /public/favicon.svg with sharp, scalable vector definitions and smooth 23% squircle corner curvature.',
+        'Multi-Resolution PWA App Packages: Compiled and synchronized high-resolution raster assets (pwa-192x192.png and pwa-512x512.png) across public and distribution directories.',
+        'Android Maskable Safe-Zone Compliance: Engineered public/icon-maskable.svg with full-bleed continuous gradient and safe-zone emblem centering for flawless Android home-screen adaptive masking.',
+        'Apple Touch & Browser Favicon Sync: Generated 180x180 apple-touch-icon.png for iOS devices and crisp 32x32 favicon.ico for all browser tabs.',
+        'Unified In-App Brand Component: Created a dedicated <AppLogo /> React component deployed across Desktop Sidebar (expanded and collapsed), Mobile Header, Onboarding Modal, and Sample Notice dialogs.',
+        'Persisted Note Workspace Settings: Saved text scale zoom (+50% reading default), layout mode (framed editorial folio vs full canvas), view mode, and note pinning state across browser refreshes.',
+        'Dedicated Avatar & Profile Section: Redesigned the Personal Profile tab in Settings with a dedicated Avatar management card, live active avatar badge, and custom photo preview.',
+        'Custom Avatar Image Upload: Added an interactive image upload button supporting PNG, JPG, WEBP, and SVG with automatic canvas compression and instant cross-app header and sidebar synchronization.',
+      ],
+    },
+    {
+      version: 'v1.2.3',
+      title: 'Full-Screen Note Workspace & Overall Analytics Activation Resolution',
+      date: 'September 27, 2026',
+      isLatest: false,
+      items: [
+        'Pure Full-Screen Note Reader: Clicking any note now opens ONLY the note in full-screen reader mode (clean typography, interactive checklists, reading stats) without the edit panel, with a dedicated "Edit Note" button to switch to editing when desired.',
+        'Split View Live Preview: Added side-by-side split layout allowing simultaneous note editing and real-time interactive checklist previewing on desktop.',
+        'View Switcher & Maximize Toggle: Integrated top-bar controls to toggle between Write, Split View, and Preview, with a maximize/restore button.',
+        'Note Keyboard Shortcuts: Added Ctrl/Cmd + Enter to immediately save notes and Escape key to close without losing context.',
+        'Progress Meter Overall Analytics Activation Fix: Resolved the Rules of Hooks ordering violation caused by an early return before useMemo hooks.',
+        'Conditional Mounting: Optimized Overall Progress Analytics to mount conditionally when activated, eliminating background re-renders when closed.',
+        'Document Metrics: Added live line, word, and character counters in the sticky header and footer of the note workspace.',
+        'Automatic +50% Reading Typography: Opening a note in full screen now automatically scales all body text, lists, and checklists up by +50% for optimal editorial legibility, automatically returning to standard scale when closed.',
+        'Serene Editorial Folio Redesign: Replaced flat full-bleed color wash with an elevated manuscript folio sheet, ambient reading backdrop, smooth shadow depth, and responsive A- / A+ zoom controls.',
+      ],
+    },
+    {
+      version: 'v1.2.2',
+      title: 'Overall Analytics Crash Fix & Runtime Resilience Hardening',
+      date: 'September 27, 2026',
+      isLatest: false,
+      items: [
+        'Resolved blank white screen crash on opening Overall Progress Analytics by defensively sanitizing uninitialized meter entries and missing unit types.',
+        'Hardened data normalization pipeline against undefined, null, or string metric values with zero-error type coercion.',
+        'Integrated client-side React ErrorBoundary wrapping the Overall Analytics Command Center with instant self-recovery options.',
+        'Guarded SVG path geometry and coordinate offsets against zero-division and NaN rendering exceptions.',
+        'Hardened Date parsing across mobile, Safari, and all timezone offsets for the consistency heatmap and trajectory charts.',
+        'Added bounding box checks on SVG interactive crosshair handlers to eliminate cursor tracking errors.',
+        'Secured Dip Recovery calculations against edge cases where minimum data points were undefined.',
+      ],
+    },
+    {
+      version: 'v1.2.1',
+      title: 'Overall Progress Analytics Diagnostic & Performance Hardening',
+      date: 'September 26, 2026',
+      isLatest: false,
+      items: [
+        'Audited Overall Progress Analytics Command Center with comprehensive mathematical and visual diagnostics across multi-dimensional meters.',
+        'Fixed comparative trend meter visibility toggle bug so meters can be freely toggled on/off to isolate curves.',
+        'Corrected streak algorithm to stop immediately upon detecting inactive days and preserve active streaks if today is still in progress.',
+        'Upgraded Momentum and Multi-line time-series charts to use smooth SVG crosshair cursor tracking, eliminating 90D/365D overlapping circle jitter.',
+        'Implemented smart tiered empty states for 0 meters, 1-meter tracking, and zero logged entries in active timeframe.',
+        'Enhanced Personal Records accuracy to capture true single-day normalized peaks and format empty records cleanly.',
+        'Completed 3-part Recovery After Dip analysis featuring Drop (↓), Rebound (↑), and Current vs Pre-Drop baseline differential.',
+        'Added historical fallback for Latest Raw values in Meter Performance Map ensuring recent ratings display accurately even on compact time windows.',
+      ],
+    },
+    {
+      version: 'v1.2.0',
+      title: 'Interactive Note Checklists, Text Styling Drawer & Progress Meter Diagnostics',
+      date: 'September 26, 2026',
+      isLatest: false,
+      items: [
+        'Implemented interactive note checklists with real-time checkbox toggles directly on note cards and list items.',
+        'Built expandable Text Controls Drawer inside Note Workspace with quick tools for board text (bold), text styling, sizes, and color palettes.',
+        'Created dual-mode Write & Live Preview tab in Note modal for instant markdown and checklist verification.',
+        'Integrated dedicated NoteContentRenderer to format headings, bold/italic text, highlights, and custom text colors cleanly.',
+        'Fixed Progress Meter 0-value logging bug to accurately recognize 0 scores across 7-day averages, monthly consistency, and streaks.',
+        'Added interactive Quick Score Setter inside Progress Details Modal to easily log or adjust ratings for any date in the heatmap.',
+        'Shifted Calendar Agenda below full-width month matrix with side-by-side Completed and Missed habit status cards.',
+        'Redesigned the full-screen Overall Progress Analytics Command Center with cross-meter 0–100% normalization, momentum trajectory curves, bento performance maps, and balance matrices.',
+        'Cleaned up progress meter workspace by removing unused legacy analytics imports and hardening type definitions.',
+      ],
+    },
+    {
+      version: 'v1.1.9',
+      title: 'Redesigned Overall Progress Command Center & Normalization Engine',
+      date: 'September 26, 2026',
+      isLatest: false,
+      items: [
+        'Redesigned Overall Progress Analytics into an immersive system-wide command center with strict 0-100% normalized cross-meter calculations.',
+        'Added time range selector (7D, 30D, 90D, ALL) with instant recalculation across all analytics modules.',
+        'Integrated interactive momentum trajectory area chart with clean date labels and comparative period analysis.',
+        'Created Meter Performance Map grid with sparklines and seamless drill-down to individual meter analytics.',
+        'Added Contribution Balance and Tracking Consistency analysis with structured distribution progress bars.',
+        'Generated automated data-driven system insights and pattern observations.',
+        'Upgraded calendar analytics to click-based date inspection to eliminate cursor jitter.',
+      ],
+    },
+    {
       version: 'v1.1.8',
       title: 'Ehsaan Studio Popup Redesign & Workspace Refinements',
       date: 'September 25, 2026',
-      isLatest: true,
+      isLatest: false,
       items: [
         'Redesigned Ehsaan Studio modal to exactly match reference design: Golden Project Hub banner, squircle project cards, and navy support footer.',
         'Refined Note Cards: Increased minimum card height, added interactive multicolour gradient color picker for background accents.',
         'Renamed "Ehsaan Flow" project to "Ehsaan Website" in the Studio modal.',
         'Enhanced Notes Workspace: Added dedicated categories, pin-to-top, and rich content capabilities.',
+        'Added powerful global search bar capable of searching all workflow items (tasks, habits, notes, and journal entries) from one place.',
+        'Implemented real-time text highlighting for search matches across notes, journals, and habit cards.',
+        'Optimized Ehsaan Studio modal layout with stacked card design and improved touch targets for mobile and tablet screens.',
+        'Updated habit and task completion check/tick buttons to a high-attention vibrant orange accent color.',
       ],
     },
     {
@@ -275,40 +444,32 @@ export const ChangelogSection: React.FC<ChangelogSectionProps> = ({ onOpenSuppor
         </span>
       </div>
 
-      {/* Developer Note at Top for ongoing release */}
-      <div className="relative bg-[#281b18] text-[#f6e9d7] rounded-2xl p-4.5 border border-[#422119] shadow-md overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        {/* Subtle decorative glow */}
-        <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-[#df734c]/20 rounded-full blur-xl pointer-events-none" />
+      {/* Enhanced Developer Note */}
+      <div className="bg-[#fbf6ef] border border-[#df734c]/30 rounded-2xl p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden">
+        {/* Subtle background accent */}
+        <div className="absolute top-0 right-0 w-24 h-24 bg-[#df734c]/5 rounded-bl-full pointer-events-none" />
 
-        <div className="flex items-start sm:items-center gap-3 relative z-10">
-          <div className="p-2.5 bg-[#df734c] text-[#fbf6ef] rounded-xl shrink-0 mt-0.5 sm:mt-0 shadow-sm">
-            <Flame size={18} />
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#df734c]/10 text-[#df734c] rounded-xl">
+            <Flame size={20} />
           </div>
           <div>
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="font-mono text-[9px] font-extrabold uppercase tracking-widest text-[#df734c] bg-[#422119] px-2 py-0.5 rounded-full border border-[#823b28]/50">
-                DEVELOPER NOTE
-              </span>
-              <span className="font-mono text-[10px] text-[#eb9d7d] font-bold">
-                Ongoing Evolution: {currentVersion}
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm font-semibold text-[#f6e9d7] leading-snug">
-              "New release {currentVersion} is live with comprehensive task analytics across 365 days and intuitive metric explanation logic overlays."
+            <h4 className="text-sm font-black text-[#281b18] uppercase tracking-tight">
+              Developer Announcement
+            </h4>
+            <p className="text-xs font-medium text-[#823b28]/80">
+              The next version will be launched at 5 January 2027. Any bug and fix request will be accepted.
             </p>
           </div>
         </div>
-
-        {onOpenSupport && (
-          <button
-            type="button"
-            onClick={onOpenSupport}
-            className="w-full sm:w-auto relative z-10 flex items-center justify-center gap-1.5 bg-[#df734c] hover:bg-[#c95f39] text-[#fbf6ef] px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer shrink-0"
-          >
-            <Heart size={14} fill="currentColor" />
-            <span>Support {currentVersion}</span>
-          </button>
-        )}
+        
+        <a
+          href="mailto:worsmon@proton.me"
+          className="flex items-center justify-center gap-2 bg-[#823b28] hover:bg-[#6f2f1f] text-[#f6e9d7] px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
+        >
+          <Heart size={14} fill="currentColor" />
+          Contact Developer (worsmon@proton.me)
+        </a>
       </div>
 
       {/* Release Timeline Cards */}

@@ -15,7 +15,8 @@ import {
   Mail,
   Github,
 } from 'lucide-react';
-import { NavSection } from '../types';
+import { NavSection, AppData } from '../types';
+import { AppLogo } from './AppLogo';
 
 interface SidebarProps {
   currentSection: NavSection;
@@ -23,6 +24,7 @@ interface SidebarProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   pendingTasksCount: number;
+  userPreferences?: AppData['userPreferences'];
   onOpenSupport?: () => void;
   onOpenEhsaanStudio?: () => void;
   theme?: 'original';
@@ -34,6 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isExpanded,
   onToggleExpand,
   pendingTasksCount,
+  userPreferences,
   onOpenSupport,
   onOpenEhsaanStudio,
   theme = 'original',
@@ -113,28 +116,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         } ${isExpanded ? 'justify-between px-2 pt-2' : 'flex-col gap-2 pt-1'}`}>
           {isExpanded ? (
             <div className="flex items-center gap-3">
-              <button onClick={onOpenEhsaanStudio} className="w-9 h-9 shadow-xs overflow-hidden shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
-                <svg className="w-full h-full" viewBox="0 0 512 512">
-                  <rect width="512" height="512" rx="128" fill="#823b28"/>
-                  <rect x="76" y="76" width="360" height="360" rx="150" fill="#df734c"/>
-                  <g transform="translate(256, 256) rotate(35) scale(1.15)">
-                    <path d="M 0,20 C -35,-5 -60,15 -50,45 C -40,75 -10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                    <path d="M 0,20 C 35,-5 60,15 50,45 C 40,75 10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                    <path d="M 0,-40 C -35,-65 -60,-45 -50,-15 C -40,15 -10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                    <path d="M 0,-40 C 35,-65 60,-45 50,-15 C 40,15 10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                    <path d="M 0,-90 C -18,-115 -18,-150 0,-155 C 18,-150 18,-115 0,-90 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                    <path d="M 0,105 L 0,-95" fill="none" stroke="#000000" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,35 L -25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,35 L 25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,-25 L -25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,-25 L 25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,105 L 0,-95" fill="none" stroke="#a3e635" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,35 L -25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,35 L 25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,-25 L -25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M 0,-25 L 25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  </g>
-                </svg>
+              <button onClick={onOpenEhsaanStudio} className="w-9 h-9 shadow-xs overflow-hidden shrink-0 cursor-pointer hover:opacity-90 transition-all rounded-full flex items-center justify-center">
+                {userPreferences?.avatarUrl ? (
+                  <img src={userPreferences.avatarUrl} alt="User Avatar" className="w-full h-full object-cover rounded-full border border-white/20" />
+                ) : userPreferences?.avatarEmoji ? (
+                  <div 
+                    className="w-full h-full flex items-center justify-center rounded-full text-base border border-white/10" 
+                    style={{ backgroundColor: userPreferences.avatarBackgroundColor || 'rgba(255,255,255,0.1)' }}
+                  >
+                    {userPreferences.avatarEmoji}
+                  </div>
+                ) : (
+                  <AppLogo idPrefix="sidebar-expanded" className="w-full h-full" />
+                )}
               </button>
               <div className="flex flex-col">
                 <span className={`font-extrabold tracking-tight text-base font-sans leading-none ${
@@ -150,28 +144,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
           ) : (
-            <button onClick={onOpenEhsaanStudio} className="w-10 h-10 shadow-xs overflow-hidden shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
-              <svg className="w-full h-full" viewBox="0 0 512 512">
-                <rect width="512" height="512" rx="128" fill="#823b28"/>
-                <rect x="76" y="76" width="360" height="360" rx="150" fill="#df734c"/>
-                <g transform="translate(256, 256) rotate(35) scale(1.15)">
-                  <path d="M 0,20 C -35,-5 -60,15 -50,45 C -40,75 -10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,20 C 35,-5 60,15 50,45 C 40,75 10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-40 C -35,-65 -60,-45 -50,-15 C -40,15 -10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-40 C 35,-65 60,-45 50,-15 C 40,15 10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-90 C -18,-115 -18,-150 0,-155 C 18,-150 18,-115 0,-90 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,105 L 0,-95" fill="none" stroke="#000000" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L -25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L 25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L -25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L 25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,105 L 0,-95" fill="none" stroke="#a3e635" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L -25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L 25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L -25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L 25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                </g>
-              </svg>
+            <button onClick={onOpenEhsaanStudio} className="w-10 h-10 shadow-xs overflow-hidden shrink-0 cursor-pointer hover:opacity-90 transition-all rounded-full flex items-center justify-center">
+              {userPreferences?.avatarUrl ? (
+                <img src={userPreferences.avatarUrl} alt="User Avatar" className="w-full h-full object-cover rounded-full border border-white/20" />
+              ) : userPreferences?.avatarEmoji ? (
+                <div 
+                  className="w-full h-full flex items-center justify-center rounded-full text-lg border border-white/10"
+                  style={{ backgroundColor: userPreferences.avatarBackgroundColor || 'rgba(255,255,255,0.1)' }}
+                >
+                  {userPreferences.avatarEmoji}
+                </div>
+              ) : (
+                <AppLogo idPrefix="sidebar-collapsed" className="w-full h-full" />
+              )}
             </button>
           )}
 
@@ -269,25 +254,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex items-center gap-1.5 pt-2">
             <a
               href="mailto:worsmon@proton.me"
-              className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-all border ${
-                isOlive
-                  ? 'bg-[#e8e4d8] hover:bg-[#ded9c9] text-[#242c1a] border-[#c2cca9]'
-                  : 'bg-[#edd8c2] hover:bg-[#e3c4a7] text-[#281b18] border-[#281b18]/10'
-              }`}
+              className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-all border bg-[#edd8c2] hover:bg-[#e3c4a7] text-[#281b18] border-[#281b18]/10"
               title="Contact Developer (worsmon@proton.me)"
             >
-              <Mail size={13} className={isOlive ? 'text-[#485832]' : 'text-[#823b28]'} />
+              <Mail size={13} className="text-[#823b28]" />
               <span>Contact</span>
             </a>
             {onOpenSupport && (
               <button
                 type="button"
                 onClick={onOpenSupport}
-                className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer shadow-xs ${
-                  isOlive
-                    ? 'bg-[#485832] hover:bg-[#394726] text-[#f4f1e8]'
-                    : 'bg-[#df734c] hover:bg-[#c95f39] text-[#fbf6ef]'
-                }`}
+                className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer shadow-xs bg-[#df734c] hover:bg-[#c95f39] text-[#fbf6ef]"
                 title="Support Project"
               >
                 <Heart size={13} fill="currentColor" />
@@ -296,14 +273,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* Full Width GitHub Button */}
+          {/* Full Width GitHub / Studio Button */}
           <button
             onClick={onOpenEhsaanStudio}
-            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-xs group border cursor-pointer ${
-              isOlive
-                ? 'bg-[#485832] hover:bg-[#394726] text-[#f4f1e8] border-[#394726]'
-                : 'bg-[#1e40af] hover:bg-[#1e3a8a] text-white border-[#1e3a8a]'
-            }`}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-xs group border cursor-pointer bg-[#1e40af] hover:bg-[#1e3a8a] text-white border-[#1e3a8a]"
             title="Ehsaan Studio"
           >
             <Sparkles size={14} className="group-hover:scale-110 transition-transform" />
@@ -314,9 +287,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="relative z-10 mt-auto flex flex-col items-center gap-2 py-2">
           <button
             onClick={onOpenEhsaanStudio}
-            className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all shadow-xs cursor-pointer ${
-              isOlive ? 'bg-[#485832] text-[#f4f1e8]' : 'bg-[#1e40af] text-white'
-            }`}
+            className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all shadow-xs cursor-pointer bg-[#1e40af] text-white"
             title="Ehsaan Studio"
           >
             <Sparkles size={16} />

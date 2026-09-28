@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavSection, AppData, Task, JournalEntry, ProgressMeter, Habit, Note } from './types';
-import { loadAppData, saveAppData, resetToSeedData, exportDataAsJSON, importDataFromJSON } from './services/storage';
+import { loadAppData, saveAppData, resetToSeedData, exportDataAsJSON, importDataFromJSON, exportNotesAsJSON } from './services/storage';
 import { formatDateStr } from './utils/habitUtils';
 import { Sidebar } from './components/Sidebar';
 import { BottomNav } from './components/BottomNav';
@@ -23,6 +23,7 @@ import { HabitDetailModal } from './components/HabitDetailModal';
 import { HabitCalendarModal } from './components/HabitCalendarModal';
 import { HabitAnalyticsModal } from './components/HabitAnalyticsModal';
 import { EhsaanStudioModal } from './components/EhsaanStudioModal';
+import { AppLogo } from './components/AppLogo';
 
 export default function App() {
   const [appData, setAppData] = useState<AppData>(() => loadAppData());
@@ -34,9 +35,19 @@ export default function App() {
   }, []);
 
   const [currentSection, setCurrentSection] = useState<NavSection>(() => {
+    const saved = localStorage.getItem('ehsaan_flow_current_section');
+    if (saved) {
+      return saved as NavSection;
+    }
     const data = loadAppData();
     return (data.userPreferences?.defaultHomeScreen as NavSection) || 'today';
   });
+
+  useEffect(() => {
+    if (currentSection) {
+      localStorage.setItem('ehsaan_flow_current_section', currentSection);
+    }
+  }, [currentSection]);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState<boolean>(() => {
     const saved = localStorage.getItem('ehsaan_flow_sidebar_expanded');
     if (saved !== null) {
@@ -441,12 +452,14 @@ export default function App() {
   };
 
   const handleTogglePinNote = (id: string) => {
-    setAppData((prev) => ({
-      ...prev,
-      notes: (prev.notes || []).map((n) =>
+    setAppData((prev) => {
+      const updatedNotes = (prev.notes || []).map((n) =>
         n.id === id ? { ...n, isPinned: !n.isPinned, updatedAt: new Date().toISOString() } : n
-      ),
-    }));
+      );
+      const updatedData = { ...prev, notes: updatedNotes };
+      saveAppData(updatedData);
+      return updatedData;
+    });
   };
 
   // Habit Handlers
@@ -588,6 +601,10 @@ export default function App() {
     exportDataAsJSON(appData);
   };
 
+  const handleExportNotesData = () => {
+    exportNotesAsJSON(appData.notes);
+  };
+
   const handleImportData = (jsonStr: string) => {
     const imported = importDataFromJSON(jsonStr);
     setAppData(imported);
@@ -617,13 +634,26 @@ export default function App() {
     avatarEmoji: string,
     autoBackupConfig?: AppData['autoBackupConfig'],
     defaultHomeScreen?: string,
-    theme?: 'original'
+    theme?: string,
+    avatarUrl?: string,
+    avatarBackgroundColor?: string
   ) => {
-    setAppData((prev) => ({
-      ...prev,
-      userPreferences: { userName, avatarEmoji, defaultHomeScreen, theme: 'original' },
-      autoBackupConfig: autoBackupConfig !== undefined ? autoBackupConfig : prev.autoBackupConfig,
-    }));
+    setAppData((prev) => {
+      const updated = {
+        ...prev,
+        userPreferences: {
+          userName,
+          avatarEmoji,
+          avatarUrl: avatarUrl !== undefined ? avatarUrl : prev.userPreferences?.avatarUrl,
+          defaultHomeScreen,
+          theme: 'original' as const,
+          avatarBackgroundColor: avatarBackgroundColor !== undefined ? avatarBackgroundColor : prev.userPreferences?.avatarBackgroundColor,
+        },
+        autoBackupConfig: autoBackupConfig !== undefined ? autoBackupConfig : prev.autoBackupConfig,
+      };
+      saveAppData(updated);
+      return updated;
+    });
   };
 
   const handleSearchChange = (query: string) => {
@@ -642,14 +672,15 @@ export default function App() {
         isExpanded={isSidebarExpanded}
         onToggleExpand={handleToggleSidebar}
         pendingTasksCount={pendingTasksCount}
+        userPreferences={appData.userPreferences}
         onOpenSupport={() => setIsSupportModalOpen(true)}
         theme="original"
       />
 
       {/* Main Screen Canvas (Independent Scrollable Container) */}
       <main className="flex-1 h-screen overflow-y-auto overflow-x-hidden p-3.5 sm:p-5 md:p-6 pb-28 sm:pb-32 lg:pb-8 max-w-7xl mx-auto w-full">
-        {/* Header Bar (Hidden in Habits view per user request) */}
-        {currentSection !== 'habits' && (
+        {/* Header Bar (Hidden in Habits & Today views per custom redesign) */}
+        {currentSection !== 'habits' && currentSection !== 'today' && (
           <Header
             currentSection={currentSection}
             onOpenNewTaskModal={handleOpenNewTaskModal}
@@ -657,6 +688,8 @@ export default function App() {
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
             userName={appData.userPreferences?.userName || 'Ehsaan'}
+            avatarEmoji={appData.userPreferences?.avatarEmoji || '🌿'}
+            avatarUrl={appData.userPreferences?.avatarUrl}
             onOpenEhsaanStudio={() => setIsEhsaanStudioOpen(true)}
             theme="original"
           />
@@ -669,6 +702,10 @@ export default function App() {
             habits={appData.habits}
             journalEntries={appData.journalEntries}
             progressMeters={appData.progressMeters}
+            userPreferences={appData.userPreferences}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            onOpenEhsaanStudio={() => setIsEhsaanStudioOpen(true)}
             onToggleTaskComplete={handleToggleTaskComplete}
             onToggleSubtaskComplete={handleToggleSubtaskComplete}
             onAddSubtask={handleAddSubtask}
@@ -686,6 +723,7 @@ export default function App() {
         {currentSection === 'habits' && (
           <HabitsView
             habits={appData.habits || []}
+            searchQuery={searchQuery}
             onToggleHabitDate={handleToggleHabitDate}
             onOpenNewHabitModal={handleOpenNewHabitModal}
             onOpenAnalyticsModal={handleOpenAnalyticsModal}
@@ -711,28 +749,33 @@ export default function App() {
         {currentSection === 'notes' && (
           <NotesView
             notes={appData.notes || []}
+            searchQuery={searchQuery}
             onOpenNewNoteModal={handleOpenNewNoteModal}
             onEditNote={handleEditNoteTrigger}
             onDeleteNote={handleDeleteNote}
             onTogglePinNote={handleTogglePinNote}
+            onSaveNote={handleSaveNote}
           />
         )}
 
         {currentSection === 'calendar' && (
           <CalendarView
             tasks={appData.tasks}
+            habits={appData.habits || []}
             journalEntries={appData.journalEntries}
             progressMeters={appData.progressMeters}
             onToggleTaskComplete={handleToggleTaskComplete}
             onToggleSubtaskComplete={handleToggleSubtaskComplete}
             onOpenNewTaskModal={handleOpenNewTaskModal}
             onOpenJournalModal={handleOpenJournalModal}
+            onToggleHabitDate={handleToggleHabitDate}
           />
         )}
 
         {currentSection === 'journal' && (
           <JournalView
             journalEntries={appData.journalEntries}
+            searchQuery={searchQuery}
             onOpenJournalModal={handleOpenJournalModal}
             onDeleteJournal={handleDeleteJournal}
           />
@@ -760,6 +803,7 @@ export default function App() {
             appData={appData}
             currentTheme="original"
             onExportData={handleExportData}
+            onExportNotes={handleExportNotesData}
             onImportData={handleImportData}
             onClearAllData={handleClearAllData}
             onUpdatePreferences={handleUpdatePreferences}
@@ -866,27 +910,7 @@ export default function App() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#281b18]/85 backdrop-blur-md p-4 sm:p-6 animate-in fade-in duration-300">
           <div className="w-full max-w-xl rounded-3xl bg-[#fbf6ef] border border-[#281b18]/15 p-6 sm:p-8 shadow-2xl text-[#281b18] text-center max-h-[95vh] overflow-y-auto">
             <div className="w-16 h-16 mx-auto mb-3 shadow-md rounded-2xl overflow-hidden shrink-0">
-              <svg className="w-full h-full" viewBox="0 0 512 512">
-                <rect width="512" height="512" rx="128" fill="#823b28"/>
-                <rect x="76" y="76" width="360" height="360" rx="150" fill="#df734c"/>
-                <g transform="translate(256, 256) rotate(35) scale(1.15)">
-                  <path d="M 0,20 C -35,-5 -60,15 -50,45 C -40,75 -10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,20 C 35,-5 60,15 50,45 C 40,75 10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-40 C -35,-65 -60,-45 -50,-15 C -40,15 -10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-40 C 35,-65 60,-45 50,-15 C 40,15 10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-90 C -18,-115 -18,-150 0,-155 C 18,-150 18,-115 0,-90 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,105 L 0,-95" fill="none" stroke="#000000" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L -25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L 25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L -25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L 25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,105 L 0,-95" fill="none" stroke="#a3e635" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L -25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L 25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L -25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L 25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                </g>
-              </svg>
+              <AppLogo idPrefix="onboarding-logo" className="w-full h-full" />
             </div>
             <h2 className="text-3xl font-black text-[#281b18] tracking-tight font-sans mt-3">
               Welcome to Ehsaan Flow
@@ -947,27 +971,7 @@ export default function App() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#281b18]/80 backdrop-blur-md p-4 sm:p-6 animate-in fade-in duration-300">
           <div className="w-full max-w-lg rounded-3xl bg-[#fbf6ef] border border-[#281b18]/15 p-6 shadow-2xl text-[#281b18] text-center max-h-[90vh] overflow-y-auto">
             <div className="w-14 h-14 mx-auto mb-3 shadow-md rounded-2xl overflow-hidden shrink-0">
-              <svg className="w-full h-full" viewBox="0 0 512 512">
-                <rect width="512" height="512" rx="128" fill="#823b28"/>
-                <rect x="76" y="76" width="360" height="360" rx="150" fill="#df734c"/>
-                <g transform="translate(256, 256) rotate(35) scale(1.15)">
-                  <path d="M 0,20 C -35,-5 -60,15 -50,45 C -40,75 -10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,20 C 35,-5 60,15 50,45 C 40,75 10,50 0,20 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-40 C -35,-65 -60,-45 -50,-15 C -40,15 -10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-40 C 35,-65 60,-45 50,-15 C 40,15 10,-10 0,-40 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,-90 C -18,-115 -18,-150 0,-155 C 18,-150 18,-115 0,-90 Z" fill="#22c55e" stroke="#000000" strokeWidth="16" strokeLinejoin="round" />
-                  <path d="M 0,105 L 0,-95" fill="none" stroke="#000000" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L -25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L 25,20" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L -25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L 25,-40" fill="none" stroke="#000000" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,105 L 0,-95" fill="none" stroke="#a3e635" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L -25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,35 L 25,20" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L -25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M 0,-25 L 25,-40" fill="none" stroke="#a3e635" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                </g>
-              </svg>
+              <AppLogo idPrefix="sample-notice-logo" className="w-full h-full" />
             </div>
             <h3 className="text-xl font-black text-[#281b18] tracking-tight font-sans">
               Sample Data Loaded (1-Year History)

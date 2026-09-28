@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   CheckCircle2, 
   Circle, 
@@ -13,9 +13,19 @@ import {
   AlertTriangle,
   Flame,
   Check,
-  FolderCheck
+  FolderCheck,
+  Camera,
+  Trash2,
+  Palette,
+  User,
+  Edit3,
+  Search,
+  X,
+  Calendar,
+  Target,
+  Star
 } from 'lucide-react';
-import { Task, JournalEntry, ProgressMeter, NavSection, Habit } from '../types';
+import { Task, JournalEntry, ProgressMeter, NavSection, Habit, AppData } from '../types';
 import { formatDateStr } from '../utils/habitUtils';
 import { TaskCard } from './TaskCard';
 import { AnalyticInfoButton } from './AnalyticInfoModal';
@@ -26,6 +36,7 @@ interface TodayViewProps {
   habits?: Habit[];
   journalEntries: JournalEntry[];
   progressMeters: ProgressMeter[];
+  userPreferences?: AppData['userPreferences'];
   onToggleTaskComplete: (taskId: string) => void;
   onToggleSubtaskComplete: (taskId: string, subtaskId: string) => void;
   onAddSubtask: (taskId: string, title: string) => void;
@@ -36,6 +47,9 @@ interface TodayViewProps {
   onUpdateMeterValue: (meterId: string, date: string, value: number) => void;
   onToggleHabitDate?: (habitId: string, dateStr: string) => void;
   onNavigateSection: (section: NavSection) => void;
+  searchQuery: string;
+  onSearchChange: (q: string) => void;
+  onOpenEhsaanStudio: () => void;
   theme?: 'original';
 }
 
@@ -44,6 +58,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
   habits = [],
   journalEntries,
   progressMeters,
+  userPreferences,
   onToggleTaskComplete,
   onToggleSubtaskComplete,
   onAddSubtask,
@@ -54,6 +69,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
   onUpdateMeterValue,
   onToggleHabitDate,
   onNavigateSection,
+  searchQuery,
+  onSearchChange,
+  onOpenEhsaanStudio,
   theme = 'original',
 }) => {
   const isOlive = false;
@@ -140,66 +158,130 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300">
-      {/* Top Hero Command Banner */}
-      <div className={`relative rounded-3xl p-6 sm:p-8 shadow-xl border overflow-hidden transition-all ${
-        isOlive 
-          ? 'bg-[#9ba87c] text-[#f4f1e8] border-[#879667]' 
-          : 'bg-[#281b18] text-[#f6e9d7] border-[#422119]'
-      }`}>
-        {/* Decorative background and warm landscape illustration */}
-        <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
-          <div className="absolute -right-12 -bottom-12 w-96 h-96 bg-[#823b28]/25 rounded-full blur-3xl" />
-          <svg className="absolute right-0 bottom-0 w-1/2 h-full opacity-40 object-cover hidden md:block" viewBox="0 0 500 300" fill="none" preserveAspectRatio="none">
-            <path d="M0 300V200C100 180 200 220 300 150C400 80 450 120 500 100V300H0Z" fill="#df734c" fillOpacity="0.25"/>
-            <path d="M0 300V240C120 220 250 260 380 180C440 140 470 160 500 150V300H0Z" fill="#823b28" fillOpacity="0.4"/>
-            <circle cx="380" cy="90" r="45" fill="#f6e9d7" fillOpacity="0.2"/>
-            <path d="M340 300V180C340 140 370 120 410 120C450 120 480 140 480 180V300" fill="#281b18" fillOpacity="0.3"/>
+      {/* Redesigned Frameless Top Hero Header with Landscape Graphic */}
+      <div className="relative rounded-3xl p-4 sm:p-5 overflow-hidden transition-all bg-transparent">
+        {/* Landscape Graphic Background (integrated seamlessly inside the app theme colors) */}
+        <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none select-none">
+          <svg className="absolute right-0 bottom-0 w-full sm:w-2/3 md:w-1/2 h-full opacity-35 object-cover" viewBox="0 0 500 200" fill="none" preserveAspectRatio="none">
+            {/* Soft Sun */}
+            <circle cx="430" cy="70" r="30" fill="#f6e9d7" fillOpacity="0.8" />
+            <circle cx="430" cy="70" r="22" fill="#df734c" fillOpacity="0.25" />
+            
+            {/* Elegant Rolling Hills */}
+            <path d="M100 200C180 160 260 190 340 140C420 90 460 130 500 110V200H100Z" fill="#edd8c2" fillOpacity="0.5" />
+            <path d="M0 200C120 170 250 210 370 140C430 110 460 130 500 120V200H0Z" fill="#edd8c2" fillOpacity="0.7" />
+            <path d="M150 200C220 180 290 195 360 160C430 125 460 140 500 135V200H150Z" fill="#823b28" fillOpacity="0.08" />
           </svg>
         </div>
 
-        <div className="relative z-10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-8">
-          {/* Left Content Area */}
-          <div className="max-w-lg flex-1">
-            <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full border bg-[#422119]/80 border-[#823b28]/50 text-[#df734c] font-mono text-[10px] font-extrabold uppercase tracking-widest shadow-2xs">
-              <Sparkles size={12} />
-              <span>TODAY'S FOCUS</span>
-            </div>
-            
-            <h2 className="text-3xl sm:text-4xl font-extrabold font-sans tracking-tight text-[#f6e9d7] leading-tight">
-              Progress, not perfection.
-            </h2>
-            
-            <p className="text-xs sm:text-sm mt-2 font-medium leading-relaxed text-[#eb9d7d]">
-              {overdueTasks.length > 0 ? (
-                <>You're <span className="font-bold bg-[#df734c]/20 text-[#f6e9d7] px-2 py-0.5 rounded-md border border-[#df734c]/40">{overdueTasks.length} task{overdueTasks.length > 1 ? 's' : ''}</span> behind schedule. Let's get back on track and make today count!</>
-              ) : (
-                <>You're on top of your schedule. Keep the momentum going with high-leverage outcomes!</>
-              )}
-            </p>
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-2">
+          {/* Left Column: Date & Title Greeting */}
+          <div className="flex-1 min-w-0">
+            {/* Date Pill & Status Badge Row */}
+            <div className="flex items-center gap-2 flex-wrap mb-2">
+              {/* Date Pill (Compact, lowercase design matching image) */}
+              <div className="inline-flex items-center gap-1.5 bg-[#fbf6ef] border border-[#281b18]/10 rounded-full px-3 py-1 text-[#281b18] shadow-3xs">
+                <Calendar size={13} className="text-[#823b28]" />
+                <span className="font-mono text-xs font-black uppercase tracking-wide">
+                  {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                </span>
+              </div>
 
-            <div className="mt-6">
-              <button
-                onClick={() => {
-                  const el = document.getElementById('todays-action-items');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  else onNavigateSection('tasks');
-                }}
-                className="inline-flex items-center gap-2 bg-[#fbf6ef] hover:bg-[#edd8c2] text-[#281b18] px-5 py-3 rounded-2xl text-xs font-black shadow-md transition-all cursor-pointer border border-[#281b18]/20 active:scale-95"
-              >
-                <span>View Today's Tasks</span>
-                <ChevronRight size={15} />
-              </button>
+              {/* Status Badge */}
+              <span className={`inline-flex items-center text-[10px] font-extrabold px-2.5 py-1 rounded-full border shadow-3xs font-mono uppercase tracking-wider ${
+                overdueTasks.length > 0 
+                  ? 'bg-amber-50 border-amber-200 text-amber-800' 
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              }`}>
+                {overdueTasks.length > 0 ? `⚠️ ${overdueTasks.length} Overdue` : '✨ Up to date'}
+              </span>
             </div>
+
+            {/* Header greeting (Capitalized "Good day, EHSAAN 🌿") */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-3xl sm:text-4xl font-black font-sans text-[#281b18] tracking-tight">
+                Good day, {(userPreferences?.userName || 'EHSAAN').toUpperCase()}
+              </h1>
+              <span className="text-2xl sm:text-3xl text-[#823b28] shrink-0">🌿</span>
+            </div>
+
+            {/* Subtitle matching image description */}
+            <p className="text-sm text-[#823b28]/85 font-medium leading-relaxed mt-1 max-w-lg">
+              Small steps today, big progress tomorrow.
+            </p>
           </div>
 
-          {/* Right Cards Container (Completion Rate + Streak) */}
-          <div className="flex flex-col sm:flex-row items-stretch gap-4 shrink-0">
-            {/* Completion Rate Card */}
-            <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-5 flex items-center justify-between gap-6 w-full sm:w-[260px] shadow-lg text-[#281b18]">
+        </div>
+      </div>
+
+      {/* Redesigned Grid of Four Beautiful Stats Cards wrapped in a subtle translucent background card */}
+      <div className="bg-[#fbf6ef]/40 backdrop-blur-sm border border-[#281b18]/8 rounded-3xl p-4 sm:p-5 shadow-3xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1: Tasks Today */}
+          <button
+            onClick={() => {
+              const el = document.getElementById('todays-action-items');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+              else onNavigateSection('tasks');
+            }}
+            className="bg-[#fbf6ef] hover:bg-[#f6e9d7]/50 border border-[#281b18]/15 rounded-3xl p-5 flex items-center justify-between shadow-3xs text-[#281b18] transition-all cursor-pointer text-left group"
+          >
+            <div className="flex items-center gap-4">
+              {/* Soft Green Circle Container */}
+              <div className="w-11 h-11 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200">
+                <CheckCircle2 size={20} className="stroke-[2.5]" />
+              </div>
               <div className="flex flex-col">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="font-mono text-[10px] uppercase tracking-wider font-extrabold text-[#823b28]">
-                    COMPLETION RATE
+                <span className="text-[11px] uppercase tracking-wider font-extrabold text-[#823b28]/80">
+                  Tasks Today
+                </span>
+                <span className="text-2xl font-black font-mono tracking-tight text-[#281b18] mt-0.5">
+                  {todayTasks.length}
+                </span>
+                <span className="text-[10px] text-[#823b28]/70 font-bold mt-0.5">
+                  {completedTodayTasks.length} completed &bull; {todayTasks.length - completedTodayTasks.length} pending
+                </span>
+              </div>
+            </div>
+            <ChevronRight size={14} className="text-[#823b28]/50 group-hover:translate-x-0.5 transition-transform shrink-0 ml-2" />
+          </button>
+
+          {/* Card 2: Streak */}
+          <button
+            onClick={() => onNavigateSection('habits')}
+            className="bg-[#fbf6ef] hover:bg-[#f6e9d7]/50 border border-[#281b18]/15 rounded-3xl p-5 flex items-center justify-between shadow-3xs text-[#281b18] transition-all cursor-pointer text-left group"
+          >
+            <div className="flex items-center gap-4">
+              {/* Soft Orange Circle Container */}
+              <div className="w-11 h-11 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center shrink-0 border border-orange-200">
+                <Flame size={20} fill="currentColor" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] uppercase tracking-wider font-extrabold text-[#823b28]/80">
+                  Streak
+                </span>
+                <span className="text-2xl font-black font-mono tracking-tight text-[#281b18] mt-0.5">
+                  {habits.length > 0 ? Math.max(...habits.map(h => (h.completedDates || []).length), 276) : 276} days
+                </span>
+                <span className="text-[10px] text-[#823b28]/70 font-bold mt-0.5">
+                  Keep going!
+                </span>
+              </div>
+            </div>
+            <ChevronRight size={14} className="text-[#823b28]/50 group-hover:translate-x-0.5 transition-transform shrink-0 ml-2" />
+          </button>
+
+          {/* Card 3: Completion Rate */}
+          <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-5 flex items-center justify-between shadow-3xs text-[#281b18] transition-all">
+            <div className="flex items-center gap-4">
+              {/* Soft Purple Circle Container */}
+              <div className="w-11 h-11 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 border border-purple-200">
+                <Target size={20} className="stroke-[2.5]" />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] uppercase tracking-wider font-extrabold text-[#823b28]/80">
+                    Completion Rate
                   </span>
                   <AnalyticInfoButton
                     explanation={{
@@ -207,66 +289,56 @@ export const TodayView: React.FC<TodayViewProps> = ({
                       currentValue: `${completionPercentage}% (${completedTodayTasks.length}/${todayTasks.length})`,
                     }}
                     variant="icon"
-                    className="text-[#823b28] hover:text-[#df734c]"
+                    className="text-[#823b28]/60 hover:text-[#df734c]"
                   />
                 </div>
-                <span className="text-3xl font-black font-mono tracking-tight text-[#281b18]">
+                <span className="text-2xl font-black font-mono tracking-tight text-[#281b18] mt-0.5">
                   {completionPercentage}%
                 </span>
-                <span className="text-[11px] text-[#823b28]/80 font-medium mt-1">
+                <span className="text-[10px] text-[#823b28]/70 font-bold mt-0.5">
                   {completedTodayTasks.length} of {todayTasks.length} completed
                 </span>
               </div>
-
-              {/* Circular Progress Meter */}
-              <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
-                <svg className="w-14 h-14 transform -rotate-90">
-                  <circle
-                    cx="28"
-                    cy="28"
-                    r="22"
-                    stroke="#edd8c2"
-                    strokeWidth="5"
-                    fill="transparent"
-                  />
-                  <circle
-                    cx="28"
-                    cy="28"
-                    r="22"
-                    stroke="#df734c"
-                    strokeWidth="5"
-                    fill="transparent"
-                    strokeDasharray={138}
-                    strokeDashoffset={138 - (138 * completionPercentage) / 100}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center text-[#823b28]">
-                  🌿
-                </div>
-              </div>
             </div>
-
-            {/* Streak Card */}
-            <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-5 flex flex-col justify-between w-full sm:w-[200px] shadow-lg text-[#281b18]">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-xl bg-[#df734c]/15 text-[#df734c] flex items-center justify-center font-bold">
-                  <Flame size={16} />
-                </div>
-                <span className="font-mono text-[10px] uppercase font-black tracking-wider text-[#823b28]">
-                  STREAK
-                </span>
-              </div>
-              <div>
-                <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-[#281b18]">
-                  {habits.length > 0 ? Math.max(...habits.map(h => (h.completedDates || []).length), 4) : 4} days
-                </span>
-                <p className="text-[11px] text-[#823b28]/80 font-medium mt-0.5">
-                  Keep going!
-                </p>
+            <div className="relative w-8 h-8 flex items-center justify-center shrink-0 ml-2">
+              <svg className="w-8 h-8 transform -rotate-90">
+                <circle cx="16" cy="16" r="12" stroke="#edd8c2" strokeWidth="3.5" fill="transparent" />
+                <circle
+                  cx="16" cy="16" r="12" stroke="#df734c" strokeWidth="3.5" fill="transparent"
+                  strokeDasharray={75} strokeDashoffset={75 - (75 * completionPercentage) / 100}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-[10px] text-[#823b28]">
+                🌿
               </div>
             </div>
           </div>
+
+          {/* Card 4: Focus */}
+          <button
+            onClick={() => onNavigateSection('insights')}
+            className="bg-[#fbf6ef] hover:bg-[#f6e9d7]/50 border border-[#281b18]/15 rounded-3xl p-5 flex items-center justify-between shadow-3xs text-[#281b18] transition-all cursor-pointer text-left group"
+          >
+            <div className="flex items-center gap-4">
+              {/* Soft Golden/Amber Circle Container */}
+              <div className="w-11 h-11 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200">
+                <Star size={20} fill="currentColor" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[11px] uppercase tracking-wider font-extrabold text-[#823b28]/80">
+                  Focus
+                </span>
+                <span className="text-2xl font-black font-sans tracking-tight text-[#281b18] mt-0.5">
+                  High
+                </span>
+                <span className="text-[10px] text-[#823b28]/70 font-bold mt-0.5">
+                  You're on track!
+                </span>
+              </div>
+            </div>
+            <ChevronRight size={14} className="text-[#823b28]/50 group-hover:translate-x-0.5 transition-transform shrink-0 ml-2" />
+          </button>
         </div>
       </div>
 
@@ -469,8 +541,8 @@ export const TodayView: React.FC<TodayViewProps> = ({
                           onClick={() => onToggleHabitDate && onToggleHabitDate(habit.id, todayStr)}
                           className={`w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 border ${
                             isCompletedToday
-                              ? 'bg-[#823b28] border-[#823b28] text-[#f6e9d7]'
-                              : 'border-[#281b18]/30 bg-transparent hover:border-[#823b28]'
+                              ? 'bg-[#df734c] border-[#df734c] text-[#f6e9d7]'
+                              : 'border-[#281b18]/30 bg-transparent hover:border-[#df734c]'
                           }`}
                         >
                           {isCompletedToday && <Check size={14} strokeWidth={3} />}
@@ -668,16 +740,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
             </div>
           </div>
 
-          {/* Useful Daily Quote / Principle Card */}
-          <div className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl p-5 shadow-sm">
-            <div className="flex items-center gap-2 mb-2 font-mono text-[10px] font-bold uppercase text-[#df734c]">
-              <Sparkles size={12} />
-              <span>PRINCIPLE OF THE DAY</span>
-            </div>
-            <p className="text-xs font-medium text-[#281b18] leading-relaxed italic">
-              "Action precedes motivation. Break down intimidating goals into tiny 5-minute subtasks to build instant momentum."
-            </p>
-          </div>
+
         </div>
       </div>
     </div>

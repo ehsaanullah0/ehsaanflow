@@ -3,23 +3,30 @@ const path = require('path');
 const fs = require('fs');
 
 const svgPath = path.resolve(__dirname, '../public/icon.svg');
+const svgMaskablePath = path.resolve(__dirname, '../public/icon-maskable.svg');
 
 const targets = [
-  { file: 'pwa-192x192.png', size: 192 },
-  { file: 'pwa-512x512.png', size: 512 },
-  { file: 'pwa-maskable-512x512.png', size: 512 },
-  { file: 'apple-touch-icon.png', size: 180 },
+  { file: 'pwa-192x192.png', size: 192, source: svgPath },
+  { file: 'pwa-512x512.png', size: 512, source: svgPath },
+  { file: 'pwa-maskable-512x512.png', size: 512, source: svgMaskablePath },
+  { file: 'apple-touch-icon.png', size: 180, source: svgPath },
 ];
 
 async function generate() {
-  console.log('Generating PNG icons from SVG...');
+  console.log('Generating PNG icons from new brand SVG...');
   for (const target of targets) {
     const dest = path.resolve(__dirname, '../public', target.file);
-    await sharp(svgPath)
+    await sharp(target.source)
       .resize(target.size, target.size)
       .png()
       .toFile(dest);
     console.log(`Created ${target.file} (${target.size}x${target.size})`);
+
+    // If dist folder exists, update it too
+    const distPath = path.resolve(__dirname, '../dist', target.file);
+    if (fs.existsSync(path.resolve(__dirname, '../dist'))) {
+      fs.copyFileSync(dest, distPath);
+    }
   }
 
   // Also convert SVG to favicon.ico
@@ -30,6 +37,12 @@ async function generate() {
     .toBuffer();
   fs.writeFileSync(destIco, buffer);
   console.log('Created favicon.ico (32x32)');
+
+  if (fs.existsSync(path.resolve(__dirname, '../dist'))) {
+    fs.copyFileSync(destIco, path.resolve(__dirname, '../dist/favicon.ico'));
+    fs.copyFileSync(svgPath, path.resolve(__dirname, '../dist/icon.svg'));
+    fs.copyFileSync(path.resolve(__dirname, '../public/favicon.svg'), path.resolve(__dirname, '../dist/favicon.svg'));
+  }
 
   console.log('All icons generated successfully!');
 }

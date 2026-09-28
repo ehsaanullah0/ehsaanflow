@@ -1,16 +1,40 @@
-export type Priority = 'high' | 'medium' | 'low';
+export type Priority = 'urgent' | 'high' | 'medium' | 'low';
+
+export interface Category {
+  id: string;
+  name: string;
+  color: string;
+  icon?: string;
+}
+
+export type ActiveTab = 'today' | 'tasks' | 'weekly' | 'calendar' | 'kanban' | 'journal' | 'stats' | 'settings';
+
+export interface UserSettings {
+  theme: 'light' | 'dark' | 'system';
+  weekStartsOn: number;
+  hasSeenWelcome: boolean;
+  sidebarCollapsed?: boolean;
+}
 
 export interface SubTask {
   id: string;
   title: string;
   completed: boolean;
-  parentTaskId: string;
+  parentTaskId?: string;
+  priority?: Priority;
+  dueDate?: string;
+  dueTime?: string;
+  notes?: string;
 }
+
+export type Subtask = SubTask;
+export type TaskColor = string;
 
 export interface Task {
   id: string;
   title: string;
   description?: string;
+  notes?: string;
   dueDate: string; // YYYY-MM-DD
   dueTime?: string; // HH:mm
   startDate?: string; // YYYY-MM-DD for duration tasks
@@ -20,11 +44,19 @@ export interface Task {
   completedAt?: string;
   createdAt: string;
   category?: string;
+  color?: string;
   tags?: string[];
+  pinned?: boolean;
+  order?: number;
+  status?: 'todo' | 'in_progress' | 'done' | string;
+  wontDo?: boolean;
   isRecurring?: 'daily' | 'weekly' | 'duration' | 'none';
   completedDates?: string[]; // Array of YYYY-MM-DD dates completed for daily recurring tasks
   subtasks: SubTask[];
 }
+
+export type MoodLevel = 'bad' | 'low' | 'neutral' | 'good' | 'great';
+export type EnergyLevel = 1 | 2 | 3 | 4 | 5;
 
 export interface JournalEntry {
   id: string;
@@ -32,9 +64,13 @@ export interface JournalEntry {
   title: string;
   content: string;
   moodEmoji?: string;
+  mood?: MoodLevel | string;
+  energy?: EnergyLevel | number;
+  highlight?: string;
+  gratitude?: string[];
   tags?: string[];
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export type MeasurementType = 'scale_1_5' | 'percentage' | 'time' | 'numeric';
@@ -84,16 +120,22 @@ export interface Note {
 export type NavSection = 'today' | 'habits' | 'tasks' | 'notes' | 'calendar' | 'journal' | 'progress' | 'insights' | 'settings';
 
 export interface AppData {
+  version?: number;
   tasks: Task[];
   habits: Habit[];
   journalEntries: JournalEntry[];
   progressMeters: ProgressMeter[];
   notes?: Note[];
+  categories?: Category[];
+  settings?: any;
+  lastBackupDate?: string;
   userPreferences: {
     userName: string;
     avatarEmoji: string;
+    avatarUrl?: string;
     defaultHomeScreen?: string;
     theme?: 'original' | 'olive';
+    avatarBackgroundColor?: string;
   };
   autoBackupConfig?: {
     enabled: boolean;

@@ -5,6 +5,71 @@
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"],
   "changelog": [
     {
+      "version": "1.3.3",
+      "improvements": [
+        "Added Avatar Background Color Picker in Settings for custom personalization",
+        "Removed black background overlay from QR support modal for a cleaner, integrated look",
+        "Streamlined QR support modal header for a more minimalist design",
+        "Cleaned up Ehsaan Studio by removing Project Hub and Footer Support banners",
+        "Streamlined Today Page header by removing the Journal entry shortcut",
+        "Simplified Today Page header graphics by removing decorative flower branch",
+        "Removed \"Principle of the Day\" quote section for a more focused layout",
+        "Enhanced overall UI consistency for a cleaner, minimalist aesthetic"
+      ]
+    },
+    {
+      "version": "1.2.8",
+      "improvements": [
+        "Wrapped the grid of four beautiful stats cards inside a subtle, premium translucent background card container (bg-[#fbf6ef]/40 backdrop-blur-sm)",
+        "Heightened contrast, framing, and visual depth for Tasks Today, Streak, Completion Rate, and Focus metrics"
+      ]
+    },
+    {
+      "version": "1.2.7",
+      "improvements": [
+        "Removed enclosing background card border and cream container from the Today Page top area for a clean, frameless aesthetic",
+        "Synchronized the user active profile photo or emoji preset directly into the top sidebar brand app icon button",
+        "Extracted Today Page local quick avatar customization drawers and triggers to centralize avatar setup solely in Settings",
+        "Grouped Date badge and Overdue task status indicator cleanly next to each other in the top header row metadata bar"
+      ]
+    },
+    {
+      "version": "1.2.6",
+      "improvements": [
+        "Created unified premium landscape top header banner on Today Page matching design mockup precisely",
+        "Rendered custom sun, rolling hills, and branch plant vectors seamlessly within organic app theme",
+        "Styled uppercase greeting header 'Good day, EHSAAN 🌿' with a decorative brand leaf emblem",
+        "Constructed rounded date pill badge with calendar vector icon in low-key monospace lettering",
+        "Integrated search input, Studio button, + New Task button, and Journal button inside top banner",
+        "Laid out horizontal grid of four beautiful stats cards: Tasks Today, Streak, Completion Rate, and Focus",
+        "Customized circle containers for Checkmark, Flame, Target, and Star metrics with premium theme ring gradients"
+      ]
+    },
+    {
+      "version": "1.2.5",
+      "improvements": [
+        "Removed profile card from sidebar navigation footer for clean, uncluttered layout",
+        "Integrated interactive Avatar Hero Card inside the Today Page command center",
+        "Added direct photo camera upload trigger overlay on Today Page avatar preview",
+        "Built collapsible inline Avatar Customizer drawer with quick emoji preset selector on Today Page",
+        "Enhanced personalized greeting with warm squircle borders, status dot, and focus stats",
+        "Extracted the redundant user profile/avatar pill capsule from the top header toolbar"
+      ]
+    },
+    {
+      "version": "1.2.4",
+      "improvements": [
+        "Implemented the exact official brand logo with white monoline stylized leaf and flow seedling on warm squircle container",
+        "Applied authentic warm gradient colour science transitioning from deep mocha espresso to radiant golden terracotta with organic depth waves",
+        "Updated SVG masters (/public/icon.svg, /public/favicon.svg) and regenerated all PWA app install icons, apple-touch-icon, and favicon.ico",
+        "Created full-bleed maskable icon with safe-zone emblem centering for Android adaptive launcher compliance",
+        "Unified all in-app branding instances with reusable AppLogo component across desktop sidebar, mobile header, and onboarding modals",
+        "Persisted note text scale zoom (+50% reading), layout mode, active note reader, and pinning state in localStorage across page refreshes",
+        "Created dedicated Avatar & Profile Section in Settings with custom photo upload, image compression, and live avatar preview",
+        "Synchronized custom avatar photo and emoji presets across Sidebar profile card, Mobile Header, and Settings"
+      ]
+    },
+    {
       "version": "1.1.6",
       "improvements": [
         "Redesigned the official brand logo to perfectly match the requested green leaf branch design with bold outlines on a peach squircle and dark brown backdrop",

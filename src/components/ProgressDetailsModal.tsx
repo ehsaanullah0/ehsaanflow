@@ -36,9 +36,12 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
 }) => {
   if (!isOpen || !meter) return null;
 
+  const today = new Date();
+  const initialTodayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const [timeRange, setTimeRange] = useState<'7d' | '14d' | '30d' | '90d'>('7d');
   const [isHeatmapExpanded, setIsHeatmapExpanded] = useState<boolean>(false);
-  const [selectedHeatmapDate, setSelectedHeatmapDate] = useState<string | null>(null);
+  const [selectedHeatmapDate, setSelectedHeatmapDate] = useState<string | null>(initialTodayStr);
+  const [hoveredHeatmapCell, setHoveredHeatmapCell] = useState<any>(null);
 
   // Month navigation for monthly heatmap view
   const [activeMonthDate, setActiveMonthDate] = useState<Date>(() => new Date());
@@ -50,13 +53,7 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
     y: number;
   } | null>(null);
 
-  const [hoveredHeatmapCell, setHoveredHeatmapCell] = useState<{
-    date: string;
-    value: number;
-    formattedDate: string;
-    weekday: string;
-    level: number;
-  } | null>(null);
+
 
   // Days count for linear graph and KPI cards
   const daysCount =
@@ -73,7 +70,7 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
     dateKeys.push(`${y}-${m}-${day}`);
   }
 
-  const todayStr = dateKeys[dateKeys.length - 1];
+  const todayStr = initialTodayStr;
 
   // Max value scale reference
   const maxScale =
@@ -88,8 +85,8 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
   // Extract datapoints
   const dataPoints = dateKeys.map((d) => ({
     date: d,
-    value: meter.entries[d] || 0,
-    hasLog: d in meter.entries && meter.entries[d] > 0,
+    value: meter.entries[d] ?? 0,
+    hasLog: d in meter.entries && meter.entries[d] !== undefined && meter.entries[d] !== null,
   }));
 
   const activePoints = dataPoints.filter((p) => p.hasLog);
@@ -135,8 +132,7 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
   // 5. Current Streak
   let streak = 0;
   for (let i = dateKeys.length - 1; i >= 0; i--) {
-    const val = meter.entries[dateKeys[i]];
-    if (val && val > 0) {
+    if (dateKeys[i] in meter.entries && meter.entries[dateKeys[i]] !== undefined && meter.entries[dateKeys[i]] !== null) {
       streak++;
     } else {
       break;
@@ -252,7 +248,7 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
   // Monthly stats
   const monthActiveEntries = monthlyGrid
     .filter((d): d is NonNullable<typeof d> => d !== null)
-    .filter((d) => d.value > 0);
+    .filter((d) => d.dateKey in meter.entries && meter.entries[d.dateKey] !== undefined && meter.entries[d.dateKey] !== null);
   const monthLoggedCount = monthActiveEntries.length;
   const monthAvg =
     monthLoggedCount > 0
@@ -346,7 +342,7 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
       const dateObj = new Date(date + 'T00:00:00');
       const timeDiff = Math.abs(new Date().getTime() - dateObj.getTime());
       const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-      if (diffDays <= 365 && val > 0) {
+      if (diffDays <= 365 && val !== undefined && val !== null) {
         logged++;
         sum += val;
       }
@@ -924,19 +920,6 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
                             <div
                               key={item.dateKey}
                               onClick={() => setSelectedHeatmapDate(item.dateKey)}
-                              onMouseEnter={() =>
-                                setHoveredHeatmapCell({
-                                  date: item.dateKey,
-                                  value: item.value,
-                                  formattedDate: new Date(item.dateKey + 'T00:00:00').toLocaleDateString(
-                                    'en-US',
-                                    { month: 'short', day: 'numeric', year: 'numeric' }
-                                  ),
-                                  weekday: item.weekday,
-                                  level: item.level,
-                                })
-                              }
-                              onMouseLeave={() => setHoveredHeatmapCell(null)}
                               className={`aspect-square rounded-xl flex flex-col items-center justify-between p-2 cursor-pointer transition-all hover:scale-105 border relative ${colorClass} ${
                                 item.isToday ? 'border-2 border-[#281b18]' : 'border-transparent'
                               }`}
@@ -1054,7 +1037,7 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
                                         className={`w-3.5 h-3.5 rounded-sm cursor-pointer transition-all hover:scale-125 ${colorClass} ${
                                           day.isToday ? 'border border-[#281b18]' : ''
                                         }`}
-                                        title={`${day.dateKey}: ${day.value > 0 ? formatVal(day.value) : 'No entry'}`}
+                                        title={`${day.dateKey}: ${day.dateKey in meter.entries ? formatVal(day.value) : 'No entry'}`}
                                       />
                                     );
                                   })}
@@ -1091,19 +1074,105 @@ export const ProgressDetailsModal: React.FC<ProgressDetailsModalProps> = ({
                   )}
                 </div>
 
-                {/* Floating hovered cell logs or manual logs detail */}
-                {hoveredHeatmapCell && (
-                  <div className="mt-3 bg-[#edd8c2] border border-[#d4aa86] rounded-xl px-4 py-2 flex items-center justify-between text-xs font-mono animate-in fade-in duration-150 shrink-0 shadow-2xs">
-                    <span className="font-bold text-[#281b18]">
-                      {hoveredHeatmapCell.weekday}, {hoveredHeatmapCell.formattedDate}
-                    </span>
-                    <span className="font-black text-[#823b28]">
-                      {hoveredHeatmapCell.value > 0
-                        ? `Logged score: ${formatVal(hoveredHeatmapCell.value)}`
-                        : 'No value logged'}
-                    </span>
-                  </div>
-                )}
+                {/* Selected date info bar with Interactive Logger */}
+                {(() => {
+                  const selDate = selectedHeatmapDate || todayStr;
+                  const isLogged = selDate in meter.entries && meter.entries[selDate] !== undefined && meter.entries[selDate] !== null;
+                  const selVal = isLogged ? meter.entries[selDate] : 0;
+                  const selFormatted = new Date(selDate + 'T00:00:00').toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  });
+                  const selWeekday = new Date(selDate + 'T00:00:00').toLocaleDateString('en-US', {
+                    weekday: 'long',
+                  });
+
+                  return (
+                    <div className="mt-3 bg-[#edd8c2] border border-[#d4aa86] rounded-2xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono animate-in fade-in duration-150 shrink-0 shadow-2xs">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#281b18]">
+                            {selWeekday}, {selFormatted}
+                          </span>
+                          {selDate === todayStr && (
+                            <span className="bg-[#df734c] text-white px-2 py-0.5 rounded-full text-[9px] font-bold">
+                              TODAY
+                            </span>
+                          )}
+                        </div>
+                        <span className="font-black text-[#823b28] text-xs block mt-0.5">
+                          {isLogged
+                            ? `Logged score: ${formatVal(selVal)}`
+                            : 'No value logged (tap a score button to log for this date)'}
+                        </span>
+                      </div>
+
+                      {/* Quick Interactive Score Setter for Selected Date */}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] font-bold text-[#823b28]/70 uppercase">
+                          Set Score:
+                        </span>
+                        {meter.unitType === 'scale_1_5' ? (
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <button
+                                key={s}
+                                type="button"
+                                onClick={() => onUpdateValue(meter.id, selDate, s)}
+                                className={`w-7 h-7 rounded-xl font-bold font-mono text-xs cursor-pointer transition-all ${
+                                  isLogged && selVal === s
+                                    ? 'bg-[#823b28] text-white scale-110 shadow-xs'
+                                    : 'bg-[#f6e9d7] hover:bg-[#df734c] hover:text-white text-[#281b18]'
+                                }`}
+                                title={`Set rating ${s}/5`}
+                              >
+                                {s}
+                              </button>
+                            ))}
+                          </div>
+                        ) : meter.unitType === 'percentage' ? (
+                          <div className="flex items-center gap-1">
+                            {[0, 25, 50, 75, 100].map((pct) => (
+                              <button
+                                key={pct}
+                                type="button"
+                                onClick={() => onUpdateValue(meter.id, selDate, pct)}
+                                className={`px-2 py-1 rounded-xl font-bold font-mono text-[10px] cursor-pointer transition-all ${
+                                  isLogged && selVal === pct
+                                    ? 'bg-[#823b28] text-white scale-105 shadow-xs'
+                                    : 'bg-[#f6e9d7] hover:bg-[#df734c] hover:text-white text-[#281b18]'
+                                }`}
+                              >
+                                {pct}%
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="number"
+                              min={0}
+                              max={9999}
+                              value={isLogged ? selVal : ''}
+                              placeholder="0"
+                              onChange={(e) => {
+                                const v = parseFloat(e.target.value);
+                                if (!isNaN(v)) {
+                                  onUpdateValue(meter.id, selDate, v);
+                                }
+                              }}
+                              className="w-16 bg-[#fbf6ef] border border-[#281b18]/20 rounded-xl px-2 py-1 text-xs font-bold text-[#281b18] text-center outline-none focus:border-[#823b28]"
+                            />
+                            <span className="text-[10px] font-bold text-[#823b28]">
+                              {meter.unitLabel || (meter.unitType === 'time' ? 'mins' : 'units')}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
             </div>

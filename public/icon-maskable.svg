@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Base diagonal background gradient matching brand colour science -->
+    <linearGradient id="maskWarmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#562814" />
+      <stop offset="25%" stop-color="#6d3319" />
+      <stop offset="50%" stop-color="#99481d" />
+      <stop offset="75%" stop-color="#cb6222" />
+      <stop offset="100%" stop-color="#ea7d27" />
+    </linearGradient>
+
+    <!-- Top-left deep mocha organic wave -->
+    <radialGradient id="maskDeepWave" cx="25%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#3e1a0b" stop-opacity="0.55" />
+      <stop offset="55%" stop-color="#4a200f" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#4a200f" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Bottom luminous warm amber glow -->
+    <radialGradient id="maskWarmGlow" cx="75%" cy="85%" r="60%">
+      <stop offset="0%" stop-color="#f59436" stop-opacity="0.75" />
+      <stop offset="50%" stop-color="#eb7e27" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#cb6222" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Full-bleed background for maskable safe-zone compliance -->
+  <rect width="512" height="512" fill="url(#maskWarmGrad)" />
+  <path d="M -20,-20 L 532,-20 L 532,230 C 440,310 330,390 170,380 C 70,374 -20,310 -20,310 Z" fill="url(#maskDeepWave)" />
+  <path d="M -20,270 C 80,320 180,410 340,350 C 420,320 480,250 532,240 L 532,532 L -20,532 Z" fill="url(#maskWarmGlow)" />
+  <path d="M 0,380 Q 200,480 512,320 L 512,512 L 0,512 Z" fill="#eb7e27" opacity="0.25" />
+
+  <!-- The Exact White Brand Emblem centered safely -->
+  <g transform="translate(0, 0)">
+    <!-- 1. Stylized Tilted Leaf -->
+    <path 
+      d="M 218,272 C 197,240 200,196 238,180 C 265,168 293,167 314,174 C 315,175 315,177 313,179 C 306,211 298,252 227,273 Z" 
+      fill="none" 
+      stroke="#ffffff" 
+      stroke-width="23" 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+    />
+
+    <!-- 2. Leaf Center Vein -->
+    <path 
+      d="M 224,252 C 238,230 256,214 274,206" 
+      fill="none" 
+      stroke="#ffffff" 
+      stroke-width="22" 
+      stroke-linecap="round" 
+    />
+
+    <!-- 3. Bottom Flow Wave / Stem -->
+    <path 
+      d="M 175,326 C 182,308 196,277 221,273 C 248,269 275,301 300,323 C 316,336 333,336 346,327" 
+      fill="none" 
+      stroke="#ffffff" 
+      stroke-width="23" 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+    />
+  </g>
+</svg>

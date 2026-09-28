@@ -21,34 +21,35 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose }) => 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#281b18]/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="bg-[#fbf6ef] border border-[#281b18]/15 rounded-3xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
+        className="bg-[#fbf6ef] border border-[#281b18]/10 rounded-3xl max-w-md w-full shadow-lg overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-[#281b18] text-[#f6e9d7] flex items-center justify-between border-b border-[#422119]">
+        <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-[#df734c] text-[#fbf6ef] rounded-xl flex items-center justify-center">
+            <span className="p-1.5 bg-[#df734c]/10 text-[#df734c] rounded-xl flex items-center justify-center">
               <Heart size={16} fill="currentColor" />
             </span>
             <div>
-              <h3 className="text-base font-extrabold font-sans text-[#f6e9d7]">
+              <h3 className="text-sm font-extrabold font-sans text-[#281b18]">
                 Scan to Support
               </h3>
-              <p className="text-[11px] font-mono text-[#eb9d7d]">
+              <p className="text-[10px] font-mono text-[#823b28]/70 uppercase tracking-wide">
                 UPI Instant Payment QR
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/10 text-[#eb9d7d] hover:text-[#f6e9d7] transition-colors cursor-pointer"
+            className="p-1.5 rounded-full hover:bg-[#823b28]/10 text-[#823b28]/50 hover:text-[#823b28] transition-colors cursor-pointer"
             aria-label="Close QR Code window"
           >
             <X size={20} />
           </button>
         </div>
+
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto flex flex-col items-center text-center">

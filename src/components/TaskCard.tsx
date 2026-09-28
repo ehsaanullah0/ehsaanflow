@@ -166,6 +166,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   const progressPercent = totalSubtasksCount > 0 ? Math.round((completedSubtasksCount / totalSubtasksCount) * 100) : 0;
 
   const priorityBadges: Record<Priority, { label: string; bg: string; text: string; border: string }> = {
+    urgent: {
+      label: 'URGENT',
+      bg: 'bg-rose-600',
+      text: 'text-white',
+      border: 'border-rose-700',
+    },
     high: {
       label: 'HIGH PRIORITY',
       bg: 'bg-[#df734c]',
@@ -471,7 +477,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {task.subtasks.map((subtask) => (
                 <div
                   key={subtask.id}
-                  className={`flex items-center justify-between gap-2 py-1.5 px-3 rounded-xl bg-[#f8db97] hover:bg-[#edd8c2]/80 border border-[#281b18]/10 transition-all shadow-2xs`}
+                  className={`flex items-center justify-between gap-2 py-1.5 px-3 rounded-xl ${
+                    subtask.completed
+                      ? 'bg-[#fbf6ef]/60 border-[#281b18]/10 opacity-75'
+                      : 'bg-[#fbf6ef] hover:bg-white border-[#281b18]/15'
+                  } border transition-all shadow-2xs`}
                 >
                   <button
                     onClick={() => onToggleSubtaskComplete(task.id, subtask.id)}

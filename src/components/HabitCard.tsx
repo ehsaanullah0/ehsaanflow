@@ -20,9 +20,11 @@ import {
 } from '../utils/habitUtils';
 import { AnalyticInfoButton } from './AnalyticInfoModal';
 import { ANALYTIC_EXPLANATIONS } from '../utils/analyticExplanations';
+import { HighlightText } from './HighlightText';
 
 interface HabitCardProps {
   habit: Habit;
+  searchQuery: string;
   todayStr: string;
   isCompactMode: boolean; // if true, collapsed to show name only
   isReorderMode: boolean;
@@ -38,6 +40,7 @@ interface HabitCardProps {
 
 export const HabitCard: React.FC<HabitCardProps> = ({
   habit,
+  searchQuery,
   todayStr,
   isCompactMode,
   isReorderMode,
@@ -76,8 +79,8 @@ export const HabitCard: React.FC<HabitCardProps> = ({
             title={isCompletedToday ? 'Completed today (tap to undo)' : 'Mark completed for today'}
             className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 border ${
               isCompletedToday
-                ? 'bg-[#823b28] border-[#823b28] text-[#f6e9d7] shadow-xs scale-105'
-                : 'border-[#281b18]/40 bg-transparent hover:border-[#823b28] hover:bg-[#edd8c2]/50 text-transparent'
+                ? 'bg-[#df734c] border-[#df734c] text-[#f6e9d7] shadow-xs scale-105'
+                : 'border-[#281b18]/40 bg-transparent hover:border-[#df734c] hover:bg-[#edd8c2]/50 text-transparent'
             }`}
           >
             {isCompletedToday ? (
@@ -91,11 +94,11 @@ export const HabitCard: React.FC<HabitCardProps> = ({
           <div className="flex flex-col min-w-0 flex-1">
             <h3 className="font-extrabold text-sm sm:text-base text-[#281b18] tracking-tight uppercase truncate leading-snug">
               {habit.emoji && <span className="mr-1.5 select-none font-normal">{habit.emoji}</span>}
-              <span>{habit.name}</span>
+              <span><HighlightText text={habit.name} highlight={searchQuery} /></span>
             </h3>
             {habit.description && !isCompactMode && (
               <p className="text-[11px] text-[#823b28]/80 truncate mt-0.5">
-                {habit.description}
+                <HighlightText text={habit.description} highlight={searchQuery} />
               </p>
             )}
           </div>
