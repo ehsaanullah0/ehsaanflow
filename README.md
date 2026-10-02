@@ -197,18 +197,6 @@ Everything you need for serious task management without turning the interface in
 * 🧹 Filtering
 * ↕️ Sorting
 
-### Work with tasks in bulk
-
-Select multiple tasks and perform actions together:
-
-* Complete
-* Delete
-* Reschedule
-* Change priority
-
-Because sometimes productivity means dealing with **17 tasks at once**.
-
----
 
 # 🧩 Threaded Subtasks
 
@@ -233,36 +221,6 @@ Launch Website
 Track progress at both the task and subtask level.
 
 ---
-
-# 📊 Productivity Intelligence
-
-EHSAAN Flow doesn't stop at counting completed tasks.
-
-The statistics system tracks patterns such as:
-
-* Total tasks
-* Completed tasks
-* Open tasks
-* Overdue tasks
-* Completion rate
-* On-time completion
-* Subtask completion
-* Priority distribution
-* Category distribution
-* Tag performance
-* Daily activity
-* Completion velocity
-* Peak completion weekday
-* Productivity trends
-
-### Your data becomes feedback.
-
-Not judgment.
-
-The goal isn't to make you feel productive.
-
-**It's to help you understand your productivity.**
-
 ---
 
 # 📔 Journal
