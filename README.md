@@ -1,7 +1,7 @@
 <div align="center">
     
 
-<img width="192" height="192" alt="pwa-192x192" src="https://github.com/user-attachments/assets/87e5ce98-a60b-4115-b02a-850394273b85" />
+<img width="1796" height="876" alt="Ehsäan Flow To-Do App Banner" src="https://github.com/user-attachments/assets/7930da4b-fca1-4fc3-b889-c87ed2304ff3" />
 
 
 # 🌊 EHSAAN FLOW
