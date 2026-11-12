@@ -7,7 +7,9 @@
 # 🌊 EHSAAN FLOW
 
 # POWERFUL PROJECT AND TASK MANAGER, COMPLETELY OFFLINE
-# 🔗 [**ehsaanflow.ai.studio**](https://ehsaanflow.ai.studio/)
+
+[<img width="212" height="56" alt="image" src="https://github.com/user-attachments/assets/7afd8861-9ded-4590-bb59-a62160d42721" />](https://rookieenough.github.io/Orion-Data/app/?id=ehsaanflow)
+[<img width="212" height="56" src="https://github.com/user-attachments/assets/9151bdd1-3a42-49ba-948d-89356ceaf511" />](https://ehsaanflow.ai.studio/)
 
 <p align="center">
   
