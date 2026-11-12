@@ -8,9 +8,6 @@
 
 # POWERFUL PROJECT AND TASK MANAGER, COMPLETELY OFFLINE
 
-[<img width="212" height="56" alt="image" src="https://github.com/user-attachments/assets/7afd8861-9ded-4590-bb59-a62160d42721" />](https://rookieenough.github.io/Orion-Data/app/?id=ehsaanflow)
-[<img width="212" height="56" src="https://github.com/user-attachments/assets/9151bdd1-3a42-49ba-948d-89356ceaf511" />](https://ehsaanflow.ai.studio/)
-
 <p align="center">
   
 <a href="https://youtu.be/YWJAUpBpycY" target="_blank">
@@ -20,23 +17,6 @@
     alt="Watch EHSAAN QR Demo Video"
   />
 </a>
-<p>
-  <a href="https://ehsaancolour.ai.studio/" target="_blank">
-   <img width="170" src="https://github.com/user-attachments/assets/00762234-2f32-40c0-8640-225206908e5a" />
-  </a>
-  <a href="https://ehsaanflow.ai.studio/" target="_blank">
- <img width="170" src="https://github.com/user-attachments/assets/f1f073ca-70f6-418a-8ea8-dbf07780247f" />
-  </a>
-  <a href="https://ehsaanqr.ai.studio/" target="_blank">
- <img width="170" src="https://github.com/user-attachments/assets/432a43cc-999e-4f0d-8674-07443b19ade8" />
-  </a>
-  <a href="https://ehsaanplay.ai.studio/" target="_blank">
- <img width="170" src="https://github.com/user-attachments/assets/7d64243b-7eaa-49c8-bf67-897415f990ee" />
-  </a>
-  <a href="https://ehsaancompress.ai.studio/" target="_blank">
- <img width="170" src="https://github.com/user-attachments/assets/d3a5b184-a158-4f39-abe6-a3795ef7c2eb" />
-</p>
-<br>
 </div>
 
 
@@ -47,10 +27,7 @@
 EHSAAN Flow brings your everyday productivity into one focused workspace — combining **task management, Kanban, calendar planning, weekly views, productivity analytics, and journaling** without requiring an account or a cloud backend.
 
 ## **Your work stays in your browser.Your workflow stays yours.**
-# WHAT'S NEW IN v1.2.3
-<p align="center">
 
-<img width="872" height="381" alt="image" src="https://github.com/user-attachments/assets/f919d914-43fc-48c4-b94c-a1b031b4087c" />
 
 ---
 
@@ -70,7 +47,8 @@ EHSAAN Flow brings your everyday productivity into one focused workspace — com
 
 ### **Live application**
 
-## 👉 https://ehsaanflow.ai.studio/
+[<img width="212" height="56" alt="image" src="https://github.com/user-attachments/assets/7afd8861-9ded-4590-bb59-a62160d42721" />](https://rookieenough.github.io/Orion-Data/app/?id=ehsaanflow)
+[<img width="212" height="56" src="https://github.com/user-attachments/assets/9151bdd1-3a42-49ba-948d-89356ceaf511" />](https://ehsaanflow.ai.studio/)
 
 ---
 
@@ -272,30 +250,8 @@ The project is intentionally component-driven so individual parts of the experie
 # 💛 SUPPORT THE DEVELOPMENT
 ## [ CLICK HERE TO PAY DIRECTLY.](https://ehsaan.odoo.com/support)
 
-<img width="250" height="250" alt="ehsaan-qr-1024x1024 (1)" src="https://github.com/user-attachments/assets/7139284e-c5e5-424a-bd52-aa71ccc392a8" />
-</p>
-
-<p align="center">
   <sub>If you find something useful here, a ⭐ is always appreciated.</sub>
 </p>
-
----
-
-# 🔐 Privacy Philosophy
-
-EHSAAN Flow follows a simple approach:
-
-### Local first.
-
-Your tasks and journal are personal data.
-
-The application therefore avoids making a cloud account a prerequisite for using the core experience.
-
-Your browser is the primary home for your data.
-
-**You control your data.
-You can export it.
-You can restore it.**
 
 ---
 
@@ -308,18 +264,6 @@ See [`LICENSE`](LICENSE) for details.
 ---
 
 <p align="center">
-
-### 🌊 EHSAAN Flow
-
-**Plan less. Flow more.**
-
-Made with care by **EHSAAN**
-
-</p>
-
----
-
-<p align="center">
 ✦ FINDING GOOD RESOURCES SHOULDN'T BE HARD.
 
 <p align="center">
@@ -328,6 +272,20 @@ Made with care by **EHSAAN**
   </a>
 </p>
 
+<p align="center">
+  <a href="https://ehsaancolour.ai.studio/" target="_blank">
+   <img width="170" src="https://github.com/user-attachments/assets/00762234-2f32-40c0-8640-225206908e5a" />
+  </a>
+  <a href="https://ehsaanqr.ai.studio/" target="_blank">
+ <img width="170" src="https://github.com/user-attachments/assets/432a43cc-999e-4f0d-8674-07443b19ade8" />
+  </a>
+  <a href="https://ehsaanplay.ai.studio/" target="_blank">
+ <img width="170" src="https://github.com/user-attachments/assets/7d64243b-7eaa-49c8-bf67-897415f990ee" />
+  </a>
+  <a href="https://ehsaancompress.ai.studio/" target="_blank">
+ <img width="170" src="https://github.com/user-attachments/assets/d3a5b184-a158-4f39-abe6-a3795ef7c2eb" />
+</p>
+      
 <p align="center">
 **EHSAAN ULLAH**
 
