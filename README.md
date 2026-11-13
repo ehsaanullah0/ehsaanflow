@@ -19,6 +19,8 @@
 </a>
 </div>
 
+> [!IMPORTANT]
+> This repo was archived by the owner untill 5th july 2027. the project is now in maintainance mode for that period.
 
 ### A calm, powerful, local-first workspace for getting things done.
 
